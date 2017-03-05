@@ -15,7 +15,7 @@
     "postupdate-deps": "bower update",
 
     "prestart": "npm install",
-    "serve": "http-server -a localhost -p 8000 -c-1"
+    "start": "http-server -a localhost -p 8000 -c-1"
 
   }
 }

@@ -5,6 +5,9 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "angular-material": "^1.1.3"
+    "angular-material": "^1.1.3",
+    "roboto-fontface": "^0.7.0",
+    "angular-ui-router": "^0.4.2",
+    "material-design-icons": "^3.0.1"
   }
 }
