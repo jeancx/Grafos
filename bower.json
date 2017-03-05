@@ -1,0 +1,10 @@
+{
+  "name": "grafos",
+  "description": "grafos",
+  "version": "1.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular-material": "^1.1.3"
+  }
+}
