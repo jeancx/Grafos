@@ -1,4 +1,4 @@
-<md-toolbar class="md-menu-toolbar">
+<md-toolbar class="md-menu-toolbar" style="z-index: 1;">
     <div layout="row" layout-align="center center">
         <div>
             <h2 class="md-toolbar-tools" layout-align="center center">Editor de Grafos</h2>
@@ -196,19 +196,18 @@
 
 <section layout="row" flex>
 
-    <md-sidenav class="md-sidenav-left" md-component-id="left" md-disable-backdrop>
+    <md-sidenav class="md-sidenav-left" md-component-id="left" style="z-index: 2;" md-disable-backdrop>
 
         <md-toolbar class="md-theme-indigo">
-            <h1 class="md-toolbar-tools">Disabled Backdrop</h1>
+            <h1 class="md-toolbar-tools">Histórico de Ações</h1>
         </md-toolbar>
 
-        <md-content layout-margin>
-            <p>
-                This sidenav is not showing any backdrop, where users can click on it, to close the sidenav.
-            </p>
-            <md-button ng-click="toggleLeft()" class="md-accent">
-                Close this Sidenav
-            </md-button>
+        <md-content>
+            <md-list flex>
+                <md-list-item ng-repeat="item in data.historico">
+                    {{item}}
+                </md-list-item>
+            </md-list>
         </md-content>
 
     </md-sidenav>

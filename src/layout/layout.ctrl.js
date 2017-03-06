@@ -13,6 +13,7 @@
         fn.start = function () {
             data.marginLeft = {'margin-left': '320px'};
             data.nodes = [];
+            data.historico = [];
         };
 
         fn.start();
@@ -30,13 +31,6 @@
             if(name == 'addNode'){
                 fn.addNode();
             }
-
-            $mdDialog.show($mdDialog.alert()
-                .title(name)
-                .textContent('You triggered the "' + name + '" action')
-                .ok('Great')
-                .targetEvent(ev)
-            );
         };
 
         $scope.$watch('data.settings.sideNav', function () {
@@ -54,11 +48,22 @@
         };
 
         fn.addNode = function () {
+            var nextLetter = '';
             if (data.nodes.length <= 0) {
-                data.nodes.push("A");
+                nextLetter = 'A';
             } else {
-                data.nodes.push(String.fromCharCode(data.nodes[data.nodes.length - 1].charCodeAt(0) + 1));
+                nextLetter = String.fromCharCode(data.nodes[data.nodes.length - 1].charCodeAt(0) + 1);
             }
+            data.nodes.push(nextLetter);
+            data.historico.push("Node Adicionado: " + nextLetter);
+        };
+
+        fn.alert = function (message) {
+            $mdDialog.show($mdDialog.alert()
+                .title('Alerta!')
+                .textContent(message)
+                .ok('OK')
+            );
         };
 
     }
