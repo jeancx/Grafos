@@ -17,7 +17,7 @@
             })
             .state('app', {
                 url: '/app',
-                abstract: true,
+                abstract: false,
                 templateUrl: 'src/layout/layout.html',
                 controller: 'LayoutCtrl'
             })

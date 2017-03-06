@@ -14,44 +14,44 @@
                                 <md-button ng-click="$mdMenu.open()">Novo</md-button>
                                 <md-menu-content>
                                     <md-menu-item>
-                                        <md-button ng-click="fn.sampleAction('New Document', $event)">
+                                        <md-button ng-click="fn.actions('New Document', $event)">
                                             Document
                                         </md-button>
                                     </md-menu-item>
                                     <md-menu-item>
-                                        <md-button ng-click="fn.sampleAction('New Spreadsheet', $event)">
+                                        <md-button ng-click="fn.actions('New Spreadsheet', $event)">
                                             Spreadsheet
                                         </md-button>
                                     </md-menu-item>
                                     <md-menu-item>
-                                        <md-button ng-click="fn.sampleAction('New Presentation', $event)">
+                                        <md-button ng-click="fn.actions('New Presentation', $event)">
                                             Presentation
                                         </md-button>
                                     </md-menu-item>
                                     <md-menu-item>
-                                        <md-button ng-click="fn.sampleAction('New Form', $event)">Form</md-button>
+                                        <md-button ng-click="fn.actions('New Form', $event)">Form</md-button>
                                     </md-menu-item>
                                     <md-menu-item>
-                                        <md-button ng-click="fn.sampleAction('New Drawing', $event)">Drawing
+                                        <md-button ng-click="fn.actions('New Drawing', $event)">Drawing
                                         </md-button>
                                     </md-menu-item>
                                 </md-menu-content>
                             </md-menu>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('Open', $event)">
+                            <md-button ng-click="fn.actions('Open', $event)">
                                 Open...
                                 <span class="md-alt-text"> {{ 'M-O' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button disabled="disabled" ng-click="fn.sampleAction('Rename', $event)">
+                            <md-button disabled="disabled" ng-click="fn.actions('Rename', $event)">
                                 Rename
                             </md-button>
                         </md-menu-item>
                         <md-menu-divider></md-menu-divider>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('Print', $event)">
+                            <md-button ng-click="fn.actions('Print', $event)">
                                 Print
                                 <span class="md-alt-text">{{ 'M-P' | keyboardShortcut }}</span>
                             </md-button>
@@ -61,19 +61,19 @@
                 <md-menu>
                     <button ng-click="$mdMenu.open()">
                         <md-icon>mode_edit</md-icon>
-                        Editar
+                        Editar Grafo
                     </button>
                     <md-menu-content>
                         <md-menu-item class="md-indent">
-                            <md-icon>undo</md-icon>
-                            <md-button ng-click="fn.sampleAction('undo', $event)">
-                                Undo
-                                <span class="md-alt-text">{{ 'M-Z' | keyboardShortcut }}</span>
+                            <md-icon>add_circle</md-icon>
+                            <md-button ng-click="fn.actions('addNode', $event)">
+                                Adicionar Node
+                                <span class="md-alt-text">{{ 'M-N' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item class="md-indent">
                             <md-icon>redo</md-icon>
-                            <md-button ng-click="fn.sampleAction('redo', $event)">
+                            <md-button ng-click="fn.actions('redo', $event)">
                                 Redo
                                 <span class="md-alt-text">{{ 'M-Y' | keyboardShortcut }}</span>
                             </md-button>
@@ -81,21 +81,21 @@
                         <md-menu-divider></md-menu-divider>
                         <md-menu-item class="md-indent">
                             <md-icon>content_cut</md-icon>
-                            <md-button ng-click="fn.sampleAction('cut', $event)">
+                            <md-button ng-click="fn.actions('cut', $event)">
                                 Cut
                                 <span class="md-alt-text">{{ 'M-X' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item class="md-indent">
                             <md-icon>content_copy</md-icon>
-                            <md-button ng-click="fn.sampleAction('copy', $event)">
+                            <md-button ng-click="fn.actions('copy', $event)">
                                 Copy
                                 <span class="md-alt-text">{{ 'M-C' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item class="md-indent">
                             <md-icon>content_paste</md-icon>
-                            <md-button ng-click="fn.sampleAction('paste', $event)">
+                            <md-button ng-click="fn.actions('paste', $event)">
                                 Paste
                                 <span class="md-alt-text">{{ 'M-P' | keyboardShortcut }}</span>
                             </md-button>
@@ -103,7 +103,7 @@
                         <md-menu-divider></md-menu-divider>
                         <md-menu-item class="md-indent">
                             <md-icon>search</md-icon>
-                            <md-button ng-click="fn.sampleAction('Find and replace', $event)">
+                            <md-button ng-click="fn.actions('Find and replace', $event)">
                                 Find and replace...
                                 <span class="md-alt-text">{{ 'M-S-H' | keyboardShortcut }}</span>
                             </md-button>
@@ -136,16 +136,8 @@
                         </md-menu-item>
                         <md-menu-divider></md-menu-divider>
                         <md-menu-item type="checkbox" ng-model="data.settings.showRuler">Show ruler</md-menu-item>
-                        <md-menu-item type="checkbox" ng-model="data.settings.showEquationToolbar">Show equation
-                            toolbar
-                        </md-menu-item>
-                        <md-menu-item type="checkbox" ng-model="data.settings.showSpellingSuggestions">Show spelling
-                            suggestions
-                        </md-menu-item>
                         <md-menu-divider></md-menu-divider>
-                        <md-menu-item type="checkbox" ng-model="data.settings.compactControls">Compact controls
-                        </md-menu-item>
-                        <md-menu-item type="checkbox" ng-model="data.settings.fullScreen">Full screen</md-menu-item>
+                        <md-menu-item type="checkbox" ng-model="data.settings.sideNav">Menu Lateral</md-menu-item>
                     </md-menu-content>
                 </md-menu>
                 <md-menu>
@@ -155,37 +147,37 @@
                     </button>
                     <md-menu-content>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('bold', $event)">
+                            <md-button ng-click="fn.actions('bold', $event)">
                                 Bold
                                 <span class="md-alt-text"> {{ 'M-B' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('italic', $event)">
+                            <md-button ng-click="fn.actions('italic', $event)">
                                 Italic
                                 <span class="md-alt-text">{{ 'M-I' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('underline', $event)">
+                            <md-button ng-click="fn.actions('underline', $event)">
                                 Underline
                                 <span class="md-alt-text">{{ 'M-U' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('strikethrough', $event)">
+                            <md-button ng-click="fn.actions('strikethrough', $event)">
                                 Strikethrough
                                 <span class="md-alt-text">{{ 'A-S-5' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('superscript', $event)">
+                            <md-button ng-click="fn.actions('superscript', $event)">
                                 Superscript
                                 <span class="md-alt-text">{{ 'M-.' | keyboardShortcut }}</span>
                             </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                            <md-button ng-click="fn.sampleAction('subscript', $event)">
+                            <md-button ng-click="fn.actions('subscript', $event)">
                                 Subscript
                                 <span class="md-alt-text">{{ 'M-,' | keyboardShortcut }}</span>
                             </md-button>
@@ -201,4 +193,26 @@
     </div>
 </md-toolbar>
 
-<div class="main-page" ui-view></div>
+
+<section layout="row" flex>
+
+    <md-sidenav class="md-sidenav-left" md-component-id="left" md-disable-backdrop>
+
+        <md-toolbar class="md-theme-indigo">
+            <h1 class="md-toolbar-tools">Disabled Backdrop</h1>
+        </md-toolbar>
+
+        <md-content layout-margin>
+            <p>
+                This sidenav is not showing any backdrop, where users can click on it, to close the sidenav.
+            </p>
+            <md-button ng-click="toggleLeft()" class="md-accent">
+                Close this Sidenav
+            </md-button>
+        </md-content>
+
+    </md-sidenav>
+
+    <div class="main-page" ng-style="data.marginLeft" flex ng-include="'src/layout/main.html'"></div>
+
+</section>

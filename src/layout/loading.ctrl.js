@@ -7,7 +7,7 @@
 
     console.log("lol");
 
-    $state.go('app.funcoes');
+    $state.go('app');
 
   }
 })();
