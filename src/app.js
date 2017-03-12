@@ -38,6 +38,7 @@
 
     function keyboardShortcut($window) {
         return function (str) {
+            return str;
             if (!str) return;
             var keys = str.split('-');
             var isOSX = /Mac OS X/.test($window.navigator.userAgent);
