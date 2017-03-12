@@ -32,26 +32,50 @@
 
         document.body.onkeydown = function (e) {
             console.log(e.keyCode);
-            if (Number(e.keyCode) === 86) {
+            if (e.keyCode === 48 || e.keyCode === 96) {
+                $scope.$apply(fn.criarGrafo());
+            } else if (e.keyCode === 49 || e.keyCode === 97) {
                 $scope.$apply(fn.addVertice());
-            } else if (Number(e.keyCode) === 66) {
+            } else if (e.keyCode === 50 || e.keyCode === 98) {
                 $scope.$apply(fn.rmVertice());
-            } else if (Number(e.keyCode) === 65) {
+            } else if (e.keyCode === 51 || e.keyCode === 99) {
                 $scope.$apply(fn.addAresta());
-            } else if (Number(e.keyCode) === 83) {
+            } else if (e.keyCode === 52 || e.keyCode === 100) {
                 $scope.$apply(fn.rmAresta());
+            } else if (e.keyCode === 53 || e.keyCode === 101) {
+                $scope.$apply(fn.vrVertice(null, true));
+            } else if (e.keyCode === 54 || e.keyCode === 102) {
+                $scope.$apply(fn.vrAresta());
+            } else if (e.keyCode === 55 || e.keyCode === 103) {
+                $scope.$apply(fn.rtArestas());
+            } else if (e.keyCode === 56 || e.keyCode === 104) {
+                $scope.$apply(fn.printGrafo());
+            } else if (e.keyCode === 57 || e.keyCode === 105) {
+                $scope.$apply(fn.abrirXML());
             }
         };
 
         fn.actions = function (name, ev) {
-            if (name == 'criarGrafo') {
+            if (name == 'criarGrafo') { // 0
                 fn.criarGrafo();
-            } else if (name == 'addVertice') {
+            } else if (name == 'addVertice') { // 1
                 fn.addVertice();
-            } else if (name == 'addAresta') {
+            } else if (name == 'rmVertice') { // 2
+                fn.rmVertice();
+            } else if (name == 'addAresta') { // 3
                 fn.addAresta();
-            } else if (name == 'rmAresta') {
+            } else if (name == 'rmAresta') { // 4
                 fn.rmAresta();
+            } else if (name == 'vrVertice') { // 5
+                fn.vrVertice(null, true);
+            } else if (name == 'vrAresta') { // 6
+                fn.vrAresta();
+            } else if (name == 'rtArestas') { // 7
+                fn.rtArestas();
+            } else if (name == 'printGrafo') { // 8
+                fn.printGrafo();
+            } else if (name == 'abrirXML') { // 9
+                fn.abrirXML();
             }
         };
 
@@ -163,8 +187,37 @@
         };
 
         // Verificar Vértice (Verifica se existe um vértice no grafo com um rótulo específico)
-        fn.vrVertice = function () {
-
+        fn.vrVertice = function (label, showAlert) {
+            if (label) {
+                var exists = false;
+                angular.forEach(data.grafo.vertices, function (vertice, index) {
+                    if (label == vertice) {
+                        exists = true;
+                    }
+                });
+                if (showAlert) {
+                    if(exists){
+                        fn.alert("Existe o Vértice: " + label);
+                    } else {
+                        fn.alert("Não Existe o Vértice: " + label);
+                    }
+                }
+                return exists;
+            } else {
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/vrVertice.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: data.grafo
+                    }
+                }).then(function (resposta) {
+                    if (resposta) {
+                        fn.vrVertice(resposta, showAlert);
+                    }
+                });
+            }
         };
 
         // Verificar Aresta (Verifica se existe uma aresta ligando dois vértices especificados)
@@ -182,6 +235,7 @@
 
         };
 
+        // (Extra) abrir XML
         fn.abrirXML = function () {
 
         };

@@ -2,7 +2,7 @@
     <form ng-cloak>
         <md-toolbar>
             <div class="md-toolbar-tools">
-                <h2>Criar Grafo</h2>
+                <h2>Verifica Existência de Vértice</h2>
                 <span flex></span>
                 <md-button class="md-icon-button" ng-click="cancela()">
                     <md-icon aria-label="Fechar">close</md-icon>
@@ -12,16 +12,14 @@
 
         <md-dialog-content>
             <md-content layout-padding>
-                <p>
-                    Tipo de Grafo:
-                    <span style="color: rgba(0,128,0,0.8);">
-                    {{ resposta ? 'Direcional' : 'Não Direcional' }}
-                </span>
-                </p>
-                <md-radio-group ng-model="resposta">
-                    <md-radio-button ng-value="true" class="md-primary">Direcional</md-radio-button>
-                    <md-radio-button ng-value="false"> Não Direcional</md-radio-button>
-                </md-radio-group>
+
+                <div layout="row">
+                    <md-input-container flex>
+                        <label>Vértice</label>
+                        <input ng-model="resposta" type="text">
+                    </md-input-container>
+                </div>
+
             </md-content>
         </md-dialog-content>
 
