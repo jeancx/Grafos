@@ -31,7 +31,7 @@
         fn.start();
 
         document.body.onkeydown = function (e) {
-            console.log(e.keyCode);
+            //console.log(e.keyCode);
             if (e.keyCode === 48 || e.keyCode === 96) {
                 $scope.$apply(fn.criarGrafo());
             } else if (e.keyCode === 49 || e.keyCode === 97) {
@@ -52,6 +52,8 @@
                 $scope.$apply(fn.printGrafo());
             } else if (e.keyCode === 57 || e.keyCode === 105) {
                 $scope.$apply(fn.abrirXML());
+            } else if (e.keyCode === 58 || e.keyCode === 106) {
+                $scope.$apply(fn.vrPlanaridade());
             }
         };
 
@@ -76,6 +78,8 @@
                 fn.printGrafo();
             } else if (name == 'abrirXML') { // 9
                 fn.abrirXML();
+            } else if (name == 'vrPlanaridade') { // 9
+                fn.vrPlanaridade(true);
             }
         };
 
@@ -92,7 +96,8 @@
                 parent: angular.element(document.body),
                 clickOutsideToClose: true,
                 locals: {
-                    grafo: data.grafo
+                    grafo: data.grafo,
+                    fn: fn
                 }
             }).then(function (resposta) {
                 data.grafo.direcionado = resposta;
@@ -150,7 +155,8 @@
                 parent: angular.element(document.body),
                 clickOutsideToClose: true,
                 locals: {
-                    grafo: data.grafo
+                    grafo: data.grafo,
+                    fn: fn
                 }
             }).then(function (resposta) {
                 if (resposta[0] && resposta[1]) {
@@ -175,7 +181,8 @@
                     parent: angular.element(document.body),
                     clickOutsideToClose: true,
                     locals: {
-                        grafo: data.grafo
+                        grafo: data.grafo,
+                        fn: fn
                     }
                 }).then(function (resposta) {
                     if (resposta[0] && resposta[1]) {
@@ -210,7 +217,8 @@
                     parent: angular.element(document.body),
                     clickOutsideToClose: true,
                     locals: {
-                        grafo: data.grafo
+                        grafo: data.grafo,
+                        fn: fn
                     }
                 }).then(function (resposta) {
                     if (resposta) {
@@ -242,6 +250,7 @@
                         fn.alert("Não Existe a Aresta: " + a + (data.grafo.direcionado ? " -> " : " <> ") + b);
                     }
                 }
+                console.log(a,b,exists);
                 return exists;
             } else {
                 $mdDialog.show({
@@ -250,7 +259,8 @@
                     parent: angular.element(document.body),
                     clickOutsideToClose: true,
                     locals: {
-                        grafo: data.grafo
+                        grafo: data.grafo,
+                        fn: fn
                     }
                 }).then(function (resposta) {
                     if (resposta[0] && resposta[1]) {
@@ -290,7 +300,8 @@
                     parent: angular.element(document.body),
                     clickOutsideToClose: true,
                     locals: {
-                        grafo: data.grafo
+                        grafo: data.grafo,
+                        fn: fn
                     }
                 }).then(function (resposta) {
                     if (resposta) {
@@ -302,12 +313,53 @@
 
         // Imprimir Grafo (Exibe em forma de texto todos os vértices e as arestas ligadas à eles)
         fn.printGrafo = function () {
-
+            $mdDialog.show({
+                controller: DialogCtrl,
+                templateUrl: 'src/layout/dialogs/printGrafo.html',
+                parent: angular.element(document.body),
+                clickOutsideToClose: true,
+                locals: {
+                    grafo: data.grafo,
+                    fn: fn
+                }
+            });
         };
 
         // (Extra) abrir XML
         fn.abrirXML = function () {
 
+        };
+
+
+        // Verificar Planaridade
+        fn.vrPlanaridade = function (showAlert) {
+            if (a && b) {
+                var planar = false;
+                angular.forEach(data.grafo.arestas, function (aresta, index) {
+                    for (var a = 0; a < data.grafo.arestas.length; a++) {
+                        if (data.grafo.direcionado) {
+                            if (index >= 2 && data.grafo.arestas[a][0] == aresta[1]) {
+                                planar = true;
+                            }
+                        } else {
+                            if (index >= 2) {
+                                if (aresta.indexOf(data.grafo.arestas[a][0])) {
+                                    planar = true;
+                                }
+                            }
+                        }
+
+                    }
+                });
+                if (showAlert) {
+                    if (planar) {
+                        fn.alert("Grafo é Planar!");
+                    } else {
+                        fn.alert("Grafo não é Planar!");
+                    }
+                }
+                return planar;
+            }
         };
 
         /* ###################################################
@@ -335,9 +387,14 @@
 
     }
 
-    function DialogCtrl($scope, $mdDialog, grafo) {
+    function DialogCtrl($scope, $mdDialog, grafo, fn) {
 
         $scope.grafo = grafo;
+
+        var data = {};
+        $scope.fn = fn;
+        $scope.data = data;
+        data.grafo = grafo;
 
         $scope.cancela = function () {
             $mdDialog.hide();

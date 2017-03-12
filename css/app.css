@@ -29,3 +29,11 @@
     padding: 0 5px;
     min-height: 30px;
 }
+
+table, th, td {
+    border: 1px solid black;
+}
+
+tr > th {
+    padding: 4px 10px;
+}

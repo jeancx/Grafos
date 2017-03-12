@@ -1,0 +1,35 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Impresssão de Grafo</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancela()">
+                    <md-icon aria-label="Fechar">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <md-content layout-padding>
+
+                <table>
+                    <tr>
+                        <th></th>
+                        <th ng-repeat="h in grafo.vertices"><span>{{h}}</span></th>
+                    </tr>
+                    <tr ng-repeat="v1 in grafo.vertices">
+                        <th ng-repeat="v2 in grafo.vertices" ng-if="$index == 0">
+                            <span>{{v1}}</span>
+                        </th>
+                        <th ng-repeat="v2 in grafo.vertices">
+                            <span>{{fn.vrAresta(v1,v2,false) ? '1' : '0'}}</span>
+                        </th>
+                    </tr>
+                </table>
+
+            </md-content>
+        </md-dialog-content>
+
+    </form>
+</md-dialog>
