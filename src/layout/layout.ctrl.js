@@ -47,7 +47,7 @@
             } else if (e.keyCode === 54 || e.keyCode === 102) {
                 $scope.$apply(fn.vrAresta(null, null, true));
             } else if (e.keyCode === 55 || e.keyCode === 103) {
-                $scope.$apply(fn.rtArestas());
+                $scope.$apply(fn.rtArestas(null, true));
             } else if (e.keyCode === 56 || e.keyCode === 104) {
                 $scope.$apply(fn.printGrafo());
             } else if (e.keyCode === 57 || e.keyCode === 105) {
@@ -71,7 +71,7 @@
             } else if (name == 'vrAresta') { // 6
                 fn.vrAresta(null, null, true);
             } else if (name == 'rtArestas') { // 7
-                fn.rtArestas();
+                fn.rtArestas(null, true);
             } else if (name == 'printGrafo') { // 8
                 fn.printGrafo();
             } else if (name == 'abrirXML') { // 9
@@ -225,9 +225,7 @@
             if (a && b) {
                 var exists = false;
                 angular.forEach(data.grafo.arestas, function (aresta, index) {
-                    console.log(aresta);
                     if (data.grafo.direcionado) {
-                        console.log(aresta);
                         if (a == aresta[0] && b == aresta[1]) {
                             exists = true;
                         }
@@ -263,8 +261,43 @@
         };
 
         // Retornar Arestas (Retorna todas as arestas de um vértice)
-        fn.rtArestas = function () {
-
+        fn.rtArestas = function (v, showAlert) {
+            if (v) {
+                var arestas = [];
+                angular.forEach(data.grafo.arestas, function (aresta, index) {
+                    if (data.grafo.direcionado) {
+                        if (v == aresta[0]) {
+                            arestas.push(aresta);
+                        }
+                    } else {
+                        if (aresta.indexOf(v) >= 0) {
+                            arestas.push(aresta);
+                        }
+                    }
+                });
+                if (showAlert) {
+                    if (arestas.length > 0) {
+                        fn.alert("Existe a Arestas: " + JSON.stringify(arestas));
+                    } else {
+                        fn.alert("Não Existe a Arestas!");
+                    }
+                }
+                return arestas;
+            } else {
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/rtArestas.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: data.grafo
+                    }
+                }).then(function (resposta) {
+                    if (resposta) {
+                        fn.rtArestas(resposta, showAlert);
+                    }
+                });
+            }
         };
 
         // Imprimir Grafo (Exibe em forma de texto todos os vértices e as arestas ligadas à eles)
