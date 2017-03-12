@@ -45,7 +45,7 @@
             } else if (e.keyCode === 53 || e.keyCode === 101) {
                 $scope.$apply(fn.vrVertice(null, true));
             } else if (e.keyCode === 54 || e.keyCode === 102) {
-                $scope.$apply(fn.vrAresta());
+                $scope.$apply(fn.vrAresta(null, null, true));
             } else if (e.keyCode === 55 || e.keyCode === 103) {
                 $scope.$apply(fn.rtArestas());
             } else if (e.keyCode === 56 || e.keyCode === 104) {
@@ -69,7 +69,7 @@
             } else if (name == 'vrVertice') { // 5
                 fn.vrVertice(null, true);
             } else if (name == 'vrAresta') { // 6
-                fn.vrAresta();
+                fn.vrAresta(null, null, true);
             } else if (name == 'rtArestas') { // 7
                 fn.rtArestas();
             } else if (name == 'printGrafo') { // 8
@@ -196,7 +196,7 @@
                     }
                 });
                 if (showAlert) {
-                    if(exists){
+                    if (exists) {
                         fn.alert("Existe o Vértice: " + label);
                     } else {
                         fn.alert("Não Existe o Vértice: " + label);
@@ -221,8 +221,45 @@
         };
 
         // Verificar Aresta (Verifica se existe uma aresta ligando dois vértices especificados)
-        fn.vrAresta = function () {
-
+        fn.vrAresta = function (a, b, showAlert) {
+            if (a && b) {
+                var exists = false;
+                angular.forEach(data.grafo.arestas, function (aresta, index) {
+                    console.log(aresta);
+                    if (data.grafo.direcionado) {
+                        console.log(aresta);
+                        if (a == aresta[0] && b == aresta[1]) {
+                            exists = true;
+                        }
+                    } else {
+                        if (aresta.indexOf(a) >= 0 && aresta.indexOf(b) >= 0) {
+                            exists = true;
+                        }
+                    }
+                });
+                if (showAlert) {
+                    if (exists) {
+                        fn.alert("Existe a Aresta: " + a + (data.grafo.direcionado ? " -> " : " <> ") + b);
+                    } else {
+                        fn.alert("Não Existe a Aresta: " + a + (data.grafo.direcionado ? " -> " : " <> ") + b);
+                    }
+                }
+                return exists;
+            } else {
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/vrAresta.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: data.grafo
+                    }
+                }).then(function (resposta) {
+                    if (resposta[0] && resposta[1]) {
+                        fn.vrAresta(resposta[0], resposta[1], showAlert);
+                    }
+                });
+            }
         };
 
         // Retornar Arestas (Retorna todas as arestas de um vértice)
