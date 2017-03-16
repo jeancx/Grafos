@@ -4,31 +4,12 @@
         .controller('LayoutCtrl', LayoutCtrl)
         .controller('DialogCtrl', DialogCtrl);
 
-    function LayoutCtrl($scope, $mdDialog, $mdSidenav, $window) {
+    function LayoutCtrl($scope, $mdDialog, $mdSidenav, $window, $timeout) {
 
         var fn = {}, data = {};
         $scope.fn = fn;
         $scope.data = data;
         $mdSidenav("left").open();
-
-        fn.start = function () {
-            data.settings = {
-                printLayout: true,
-                showRuler: true,
-                showSpellingSuggestions: true,
-                presentationMode: 'edit',
-                sideNav: true
-            };
-            data.marginLeft = {'margin-left': '320px'};
-            data.grafo = {
-                direcionado: false,
-                vertices: [],
-                arestas: []
-            };
-            data.historico = [];
-        };
-
-        fn.start();
 
         document.body.onkeydown = function (e) {
             //console.log(e.keyCode);
@@ -148,22 +129,26 @@
         };
 
         // Adicionar Aresta/Arco
-        fn.addAresta = function () {
-            $mdDialog.show({
-                controller: DialogCtrl,
-                templateUrl: 'src/layout/dialogs/addAresta.html',
-                parent: angular.element(document.body),
-                clickOutsideToClose: true,
-                locals: {
-                    grafo: data.grafo,
-                    fn: fn
-                }
-            }).then(function (resposta) {
-                if (resposta[0] && resposta[1]) {
-                    data.grafo.arestas.push(resposta);
-                    data.historico.push("Aresta Adicionada: " + resposta[0] + " -> " + resposta[1]);
-                }
-            });
+        fn.addAresta = function (a, b) {
+            if (a && b) {
+                data.grafo.arestas.push([a, b]);
+                data.historico.push("Aresta Adicionada: " + a + " -> " + b);
+            } else {
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/addAresta.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: data.grafo,
+                        fn: fn
+                    }
+                }).then(function (resposta) {
+                    if (resposta && resposta[0] && resposta[1]) {
+                        fn.addAresta(resposta[0], resposta[1]);
+                    }
+                });
+            }
         };
 
         // Remover Aresta
@@ -185,7 +170,7 @@
                         fn: fn
                     }
                 }).then(function (resposta) {
-                    if (resposta[0] && resposta[1]) {
+                    if (resposta && resposta[0] && resposta[1]) {
                         fn.rmAresta(resposta[0], resposta[1]);
                         data.historico.push("Aresta Removida: " + resposta[0] + " -> " + resposta[1]);
                     }
@@ -250,7 +235,7 @@
                         fn.alert("Não Existe a Aresta: " + a + (data.grafo.direcionado ? " -> " : " <> ") + b);
                     }
                 }
-                console.log(a,b,exists);
+                console.log(a, b, exists);
                 return exists;
             } else {
                 $mdDialog.show({
@@ -263,7 +248,7 @@
                         fn: fn
                     }
                 }).then(function (resposta) {
-                    if (resposta[0] && resposta[1]) {
+                    if (resposta && resposta[0] && resposta[1]) {
                         fn.vrAresta(resposta[0], resposta[1], showAlert);
                     }
                 });
@@ -333,32 +318,53 @@
 
         // Verificar Planaridade
         fn.vrPlanaridade = function (showAlert) {
-            if (a && b) {
-                var planar = false;
-                angular.forEach(data.grafo.arestas, function (aresta, index) {
-                    for (var a = 0; a < data.grafo.arestas.length; a++) {
-                        if (data.grafo.direcionado) {
-                            if (index >= 2 && data.grafo.arestas[a][0] == aresta[1]) {
-                                planar = true;
-                            }
-                        } else {
-                            if (index >= 2) {
-                                if (aresta.indexOf(data.grafo.arestas[a][0])) {
-                                    planar = true;
+            function _vrPlanaridade() {
+                var caminhos = [];
+                angular.forEach(data.grafo.arestas, function (inicio, index) {
+
+                    var vertices = angular.copy(data.grafo.vertices);
+                    var arestas = angular.copy(data.grafo.arestas);
+                    var arestaAtual = inicio;
+                    var passos = 0;
+                    var caminho = [];
+                    caminho.push(inicio);
+                    var visitados = [];
+                    visitados.push(inicio[0]);
+                    for (var a = 0; a < arestas.length; a++) {
+                        var next = null;
+                        for(var n = 0; n < arestas.length; n++){
+                            if(!next){
+                                if (arestas[n][0] == arestaAtual[1] && caminho.indexOf(arestas[n]) === -1) {
+                                    if (passos < 2 && visitados.indexOf(arestas[n][1]) === -1) {
+                                        next = arestaAtual = arestas[n];
+                                        caminho.push(arestaAtual);
+                                        passos++;
+                                    } else if (passos == 2) {
+                                        if (arestaAtual[1] == arestas[n][1] && arestas[n][1] == inicio[0]) {
+                                            next = arestaAtual = arestas[n];
+                                            caminho.push(arestaAtual);
+                                            passos++;
+                                            return [caminhos, true];
+                                        }
+                                    }
                                 }
                             }
+                            if(next){
+                                visitados.push(arestas[n][0]);
+                            }
                         }
-
                     }
+                    caminhos.push(caminho);
                 });
-                if (showAlert) {
-                    if (planar) {
-                        fn.alert("Grafo é Planar!");
-                    } else {
-                        fn.alert("Grafo não é Planar!");
-                    }
-                }
-                return planar;
+                return [caminhos, false];
+            }
+
+            var response = _vrPlanaridade();
+            console.log(JSON.stringify(response[0]));
+            if (response[1]) {
+                fn.alert("Grafo é Planar!");
+            } else {
+                fn.alert("Grafo não é Planar!");
             }
         };
 
@@ -384,6 +390,46 @@
                 .ok('OK')
             );
         };
+
+        fn.start = function () {
+            data.settings = {
+                printLayout: true,
+                showRuler: true,
+                showSpellingSuggestions: true,
+                presentationMode: 'edit',
+                sideNav: true
+            };
+            data.marginLeft = {'margin-left': '320px'};
+            data.grafo = {
+                direcionado: false,
+                vertices: [],
+                arestas: []
+            };
+            data.historico = [];
+
+            //GRAFO K4
+            $timeout(function () {
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addAresta('A', 'B');
+                fn.addAresta('A', 'C');
+                fn.addAresta('A', 'D');
+                fn.addAresta('B', 'A');
+                fn.addAresta('B', 'C');
+                fn.addAresta('B', 'D');
+                fn.addAresta('C', 'A');
+                fn.addAresta('C', 'B');
+                fn.addAresta('C', 'D');
+                fn.addAresta('D', 'A');
+                fn.addAresta('D', 'B');
+                fn.addAresta('D', 'C');
+            }, 1000);
+
+        };
+
+        fn.start();
 
     }
 
