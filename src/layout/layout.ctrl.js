@@ -318,49 +318,54 @@
 
         // Verificar Planaridade
         fn.vrPlanaridade = function (showAlert) {
+
             function _vrPlanaridade() {
                 var caminhos = [];
-                angular.forEach(data.grafo.arestas, function (inicio, index) {
-
-                    var vertices = angular.copy(data.grafo.vertices);
-                    var arestas = angular.copy(data.grafo.arestas);
-                    var arestaAtual = inicio;
+                var vertices = angular.copy(data.grafo.vertices);
+                var arestas = angular.copy(data.grafo.arestas);
+                var inicio = null;
+                for (var i = 0; i < vertices.length; i++) {
+                    inicio = vertices[i];
+                    var arestaAtual = null;
                     var passos = 0;
                     var caminho = [];
-                    caminho.push(inicio);
                     var visitados = [];
                     visitados.push(inicio[0]);
-                    for (var a = 0; a < arestas.length; a++) {
+                    for (var v = 0; v < vertices.length; v++) {
                         var next = null;
-                        for(var n = 0; n < arestas.length; n++){
-                            if(!next){
-                                if (arestas[n][0] == arestaAtual[1] && caminho.indexOf(arestas[n]) === -1) {
-                                    if (passos < 2 && visitados.indexOf(arestas[n][1]) === -1) {
-                                        next = arestaAtual = arestas[n];
+                        for (var a = 0; a < arestas.length; a++) {
+                            if (!next) {
+                                if (!arestaAtual) {
+                                    if(arestas[a][0] == inicio){
+                                        next = arestaAtual = arestas[a];
+                                        caminho.push(arestaAtual);
+                                    }
+                                } else if (arestaAtual[1] == arestas[a][0] && caminho.indexOf(arestas[a]) === -1) {
+                                    if (passos < 2 && visitados.indexOf(arestas[a][1]) == -1) {
+                                        next = arestaAtual = arestas[a];
                                         caminho.push(arestaAtual);
                                         passos++;
+                                        visitados.push(arestas[a][0]);
                                     } else if (passos == 2) {
-                                        if (arestaAtual[1] == arestas[n][1] && arestas[n][1] == inicio[0]) {
-                                            next = arestaAtual = arestas[n];
+                                        if (arestaAtual[1] == arestas[a][0] && arestas[a][1] == inicio) {
+                                            next = arestaAtual = arestas[a];
                                             caminho.push(arestaAtual);
                                             passos++;
+                                            caminhos.push(caminho);
                                             return [caminhos, true];
                                         }
                                     }
                                 }
                             }
-                            if(next){
-                                visitados.push(arestas[n][0]);
-                            }
                         }
                     }
                     caminhos.push(caminho);
-                });
+                }
                 return [caminhos, false];
             }
 
             var response = _vrPlanaridade();
-            console.log(JSON.stringify(response[0]));
+            console.log(JSON.stringify(response));
             if (response[1]) {
                 fn.alert("Grafo é Planar!");
             } else {
