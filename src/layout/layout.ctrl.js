@@ -107,6 +107,10 @@
             if (label) {
                 angular.forEach(data.grafo.vertices, function (vertice, index) {
                     if (label == vertice) {
+                        var vertices = fn.rtArestas(vertice);
+                        for(var v=0; v<vertices.length; v++){
+                            fn.rmAresta(vertices[v][0], vertices[v][1]);
+                        }
                         data.grafo.vertices.splice(index, 1);
                     }
                 });
@@ -117,7 +121,8 @@
                     parent: angular.element(document.body),
                     clickOutsideToClose: true,
                     locals: {
-                        grafo: data.grafo
+                        grafo: data.grafo,
+                        fn: fn
                     }
                 }).then(function (resposta) {
                     if (resposta) {
@@ -354,7 +359,7 @@
                                             caminhos.push(caminho);
                                             return [caminhos, true];
                                         }
-                                    } 
+                                    }
                                 }
                             }
                         }
