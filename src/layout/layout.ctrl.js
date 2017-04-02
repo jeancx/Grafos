@@ -414,14 +414,19 @@
                 return response;
             }
 
+            function notExist() {
+
+
+            }
+
             function rtVizinhos(nome) {
                 var vizinhos = [];
                 var atualArestas = fn.rtArestas(nome, false);
                 angular.forEach(atualArestas, function (aresta, index) {
-                    if (vizinhos.indexOf(aresta[1]) === -1) {
+                    if(notExist(aresta[1])){
                         vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
                     }
-                    if (!data.grafo.direcionado && vizinhos.indexOf(aresta[0]) === -1) {
+                    if(!data.grafo.direcionado && notExist(aresta[0])){
                         vizinhos.push({nome: aresta[0], peso: aresta[2], distancia: infinite});
                     }
                 });

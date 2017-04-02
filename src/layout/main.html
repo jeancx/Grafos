@@ -21,7 +21,7 @@
 
                 <md-chips>
                     <md-chip ng-repeat="item in data.grafo.arestas">
-                        <strong style="padding-right: 5px;">{{item[0]}}{{data.grafo.direcionado ? ' > ' : ' <> '}}{{item[1]}}</strong>
+                        <strong style="padding-right: 5px;">{{item[0]}} {{data.grafo.direcionado ? item[2] + '> ' : '<' + item[2] +'> '}} {{item[1]}}</strong>
                         <md-button class="md-icon-button md-accent" ng-click="fn.rmAresta(item[0],item[1])" aria-label="Remover">
                             <md-icon aria-hidden="true">close</md-icon>
                         </md-button>
