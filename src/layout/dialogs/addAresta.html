@@ -35,11 +35,20 @@
                     </md-input-container>
                 </div>
 
+                <div layout="row">
+                    <md-input-container flex>
+                        <label>Peso</label>
+                        <md-select ng-model="resposta2" >
+                            <md-option ng-repeat="item in data.pesos" ng-value="item">{{item}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
             </md-content>
         </md-dialog-content>
 
         <md-dialog-actions layout="row">
-            <md-button ng-click="confirma([a,b])" class="md-primary">
+            <md-button ng-click="confirma([a,b], resposta2)" class="md-primary">
                 Confirmar
             </md-button>
             <md-button ng-click="cancela()">
