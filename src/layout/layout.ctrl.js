@@ -446,7 +446,7 @@
                     if (vertice.atual) {
                         // Para cada vizinhos do vértices atual
                         var vizinhos = rtVizinhos(vertice.nome);
-
+                        console.log(vertices);
                         var set = false;
                         angular.forEach(vizinhos, function (vizinho, index) {
                             // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
