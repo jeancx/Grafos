@@ -385,12 +385,7 @@
 
         //Função Dijkstra
 
-        fn.dijkstra = function (ini, fim) {
-
-            if (!ini && !fim) {
-                ini = 'A';
-                fim = 'C';
-            }
+        fn.dijkstra = function () {
 
             var vertices = [];
 
@@ -402,10 +397,10 @@
                     aberto: true,
                     anterior: null,
                     // Definir a distância do vértice atual como zero
-                    distancia: vertice === ini ? 0 : infinite,
+                    distancia: index === 0 ? 0 : infinite,
                     nome: vertice,
                     // Definir o vértice inicial como vértice atual
-                    atual: vertice === ini
+                    atual: index === 0
                 });
             });
 
@@ -445,8 +440,6 @@
                 });
             }
 
-            console.log(isOpenAndNotInfinite());
-
             // Enquanto existir algum vértice aberto com distância não infinita
             while (isOpenAndNotInfinite()) {
                 angular.forEach(vertices, function (vertice, index) {
@@ -461,6 +454,7 @@
                                 //      Atribuir esta nova distância ao vizinho
                                 //      Definir como vértice anterior deste vizinho o vértice atual
                                 setVizinho(vizinho.nome, vizinho.peso);
+                                set = true;
                             }
                         });
                         // Marcar o vértice atual como fechado
