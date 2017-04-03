@@ -417,7 +417,7 @@
                         distancia: index === 0 ? 0 : infinite,
                         nome: vertice,
                         // Definir o vértice inicial como vértice atual
-                        atual: index === 0
+                        atual: ini === vertice.nome
                     });
                 });
 
