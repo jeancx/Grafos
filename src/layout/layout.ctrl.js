@@ -391,6 +391,7 @@
         // Inicializa Grafo e Vizinhos
         fn.startGrafo = function () {
             var grafo = [];
+
             function _rtVizinhos(nome) {
                 var vizinhos = [];
                 if (nome) {
@@ -409,6 +410,7 @@
                 }
                 return vizinhos;
             }
+
             angular.forEach(angular.copy(data.grafo.vertices), function (v, index) {
                 grafo[v] = {
                     aberto: true,
@@ -429,8 +431,6 @@
 
             var grafo = fn.startGrafo();
 
-            console.log(grafo);
-
             var stop = false;
 
             function _BFS(inicio, fim) {
@@ -439,25 +439,30 @@
                 var fila = [];
 
                 grafo[inicio].aberto = true;
+
+                // Definir um vértice inicial como atual
                 fila.push(grafo[inicio]);
+                caminho.push(grafo[inicio].nome);
 
                 if (inicio !== fim) {
                     while (fila.length > 0) {
                         var no = fila[0];
                         fila.shift();
-                        caminho.push(no);
                         for (var i = 0; i < no.vizinhos.length; i++) {
                             var vertice = no.vizinhos[i].nome;
                             if (grafo[vertice].aberto) {
                                 grafo[vertice].aberto = false;
+                                caminho.push(grafo[vertice].nome);
+                                console.log(grafo[vertice].nome);
                                 if (grafo[vertice].nome === fim) {
                                     return false;
                                 }
                                 fila.push(grafo[vertice]);
                             } else if (fila.indexOf(grafo[vertice])) {
                                 grafo[vertice].aberto = false;
+                                caminho.push(grafo[vertice].nome);
+                                console.log(grafo[vertice].nome);
                                 if (grafo[vertice].nome === fim) {
-                                    console.log(grafo[vertice]);
                                     return false;
                                 }
                                 console.log(grafo[vertice]);
