@@ -385,24 +385,89 @@
 
         //Função Dijkstra
 
-        fn.dijkstra = function () {
+        fn.dijkstra = function (ini, fim) {
 
             var vertices = [];
 
             var infinite = Math.pow(2, 53);
 
-            // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
-            angular.forEach(data.grafo.vertices, function (vertice, index) {
-                vertices.push({
-                    aberto: true,
-                    anterior: null,
-                    // Definir a distância do vértice atual como zero
-                    distancia: index === 0 ? 0 : infinite,
-                    nome: vertice,
-                    // Definir o vértice inicial como vértice atual
-                    atual: index === 0
+            if (!ini) {
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/fnDijsktra.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: data.grafo,
+                        fn: fn
+                    }
+                }).then(function (resposta) {
+                    if (resposta && resposta[0] && resposta[1]) {
+                        fn.dijkstra(resposta[0]);
+                    }
                 });
-            });
+            } else {
+
+                // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
+                angular.forEach(data.grafo.vertices, function (vertice, index) {
+                    vertices.push({
+                        aberto: true,
+                        anterior: null,
+                        // Definir a distância do vértice atual como zero
+                        distancia: index === 0 ? 0 : infinite,
+                        nome: vertice,
+                        // Definir o vértice inicial como vértice atual
+                        atual: index === 0
+                    });
+                });
+
+                var countLoop = 0;
+
+                // Enquanto existir algum vértice aberto com distância não infinita
+                while (isOpenAndNotInfinite() && countLoop < 50) {
+                    var atual = rtVerticeAtual();
+                    console.log(atual);
+                    // Para cada vizinhos do vértices atual
+                    var vizinhos = rtVizinhos(atual.nome);
+                    console.log(vizinhos);
+                    var menorPeso = {
+                        nome: '',
+                        anterior: null,
+                        distancia: infinite
+                    };
+                    angular.forEach(vizinhos, function (vizinho, index) {
+                        // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
+                        if (vizinho.distancia > (atual.distancia + vizinho.peso)) {
+                            // Atribuir esta nova distância ao vizinho
+                            // Definir como vértice anterior deste vizinho o vértice atual
+                            //setVizinho(vizinho.nome, atual.nome, (atual.distancia + vizinho.peso), false);
+                            if ((atual.distancia + vizinho.peso) < menorPeso.distancia) {
+                                menorPeso.nome = vizinho.nome;
+                                menorPeso.distancia = atual.distancia + vizinho.peso;
+                                menorPeso.anterior = atual.nome;
+                            }
+                        }
+                    });
+                    // Marcar o vértice atual como fechado
+                    setFechado(atual.nome);
+                    // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
+                    setVizinho(menorPeso.nome, menorPeso.anterior, menorPeso.distancia, true);
+
+                    countLoop++;
+                }
+
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/printDijkstra.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: vertices,
+                        fn: fn
+                    }
+                });
+
+            }
 
             function isOpenAndNotInfinite() {
                 var response = false;
@@ -451,52 +516,6 @@
                 });
                 return atual;
             }
-
-            var countLoop = 0;
-
-            // Enquanto existir algum vértice aberto com distância não infinita
-            while (isOpenAndNotInfinite() && countLoop < 50) {
-                var atual = rtVerticeAtual();
-                console.log(atual);
-                // Para cada vizinhos do vértices atual
-                var vizinhos = rtVizinhos(atual.nome);
-                console.log(vizinhos);
-                var menorPeso = {
-                    nome: '',
-                    anterior: null,
-                    distancia: infinite
-                };
-                angular.forEach(vizinhos, function (vizinho, index) {
-                    // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
-                    if (vizinho.distancia > (atual.distancia + vizinho.peso)) {
-                        // Atribuir esta nova distância ao vizinho
-                        // Definir como vértice anterior deste vizinho o vértice atual
-                        //setVizinho(vizinho.nome, atual.nome, (atual.distancia + vizinho.peso), false);
-                        if ((atual.distancia + vizinho.peso) < menorPeso.distancia) {
-                            menorPeso.nome = vizinho.nome;
-                            menorPeso.distancia = atual.distancia + vizinho.peso;
-                            menorPeso.anterior = atual.nome;
-                        }
-                    }
-                });
-                // Marcar o vértice atual como fechado
-                setFechado(atual.nome);
-                // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
-                setVizinho(menorPeso.nome, menorPeso.anterior, menorPeso.distancia, true);
-
-                countLoop++;
-            }
-
-            $mdDialog.show({
-                controller: DialogCtrl,
-                templateUrl: 'src/layout/dialogs/printDijkstra.html',
-                parent: angular.element(document.body),
-                clickOutsideToClose: true,
-                locals: {
-                    grafo: vertices,
-                    fn: fn
-                }
-            });
 
         };
 

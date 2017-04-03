@@ -1,0 +1,44 @@
+<md-dialog aria-label="Mango (Fruit)">
+    <form ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Dijkstra</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancela()">
+                    <md-icon aria-label="Fechar">close</md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content>
+            <md-content layout-padding>
+
+                <div layout="row">
+                    <md-input-container flex>
+                        <label>Início</label>
+                        <md-select ng-model="a">
+                            <md-option ng-repeat="item in grafo.vertices" ng-value="item">{{item}}</md-option>
+                        </md-select>
+                    </md-input-container>
+
+                    <md-input-container flex>
+                        <label>Fim</label>
+                        <md-select ng-model="b" >
+                            <md-option ng-repeat="item in grafo.vertices" ng-value="item">{{item}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
+            </md-content>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button ng-click="confirma([a,b])" class="md-primary">
+                Confirmar
+            </md-button>
+            <md-button ng-click="cancela()">
+                Cancelar
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
