@@ -549,7 +549,9 @@
                 fn.addAresta('C', 'E', 2);
                 fn.addAresta('A', 'E', 8);
                 fn.addAresta('A', 'B', 3);
+                fn.addAresta('A', 'D', 6);
                 fn.addAresta('E', 'B', 11);
+                fn.addAresta('B', 'D', 2);
             }, 1000);
 
         };
