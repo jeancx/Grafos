@@ -10,6 +10,7 @@
         $scope.fn = fn;
         $scope.data = data;
         $mdSidenav("left").open();
+        var infinite = Math.pow(2, 53);
 
         document.body.onkeydown = function (e) {
             console.log(e.keyCode);
@@ -387,38 +388,75 @@
         };
 
 
+        // Inicializa Grafo e Vizinhos
+        fn.startGrafo = function () {
+            var grafo = [];
+            function _rtVizinhos(nome) {
+                var vizinhos = [];
+                if (nome) {
+                    angular.forEach(fn.rtArestas(nome, false), function (vizinho, index) {
+                        if (vizinho[0] === nome) {
+                            vizinhos.push({
+                                aberto: true,
+                                anterior: null,
+                                distancia: infinite,
+                                nome: vizinho[1],
+                                atual: false,
+                                peso: vizinho[2]
+                            });
+                        }
+                    });
+                }
+                return vizinhos;
+            }
+            angular.forEach(angular.copy(data.grafo.vertices), function (v, index) {
+                grafo[v] = {
+                    aberto: true,
+                    anterior: null,
+                    distancia: infinite,
+                    nome: v,
+                    atual: false,
+                    vizinhos: _rtVizinhos(v)
+                };
+            });
+            return grafo;
+        };
+
+
         //Função BFS
 
         fn.bfs_dfs = function (ini) {
 
-            var vertices = [];
+            var grafo = fn.startGrafo();
 
-            var saiu = 0;
+            console.log(grafo);
 
-            function _BFS(grafo, inicio, fim) {
+            var stop = false;
 
+            function _BFS(inicio, fim) {
+
+                var caminho = [];
                 var fila = [];
 
-                grafo[inicio].visita = 2;
+                grafo[inicio].aberto = true;
                 fila.push(grafo[inicio]);
 
                 if (inicio !== fim) {
                     while (fila.length > 0) {
                         var no = fila[0];
                         fila.shift();
-                        for (var i = 0; i < no.filhosObj.length; i++) {
-                            var vertice = no.filhosObj[i].idVertice2;
-                            if (grafo[vertice].visita != 2) {
-                                grafo[vertice].visita = 2;
-                                if (grafo[vertice].relIdObj == fim) {
-                                    console.log(grafo[vertice]);
+                        caminho.push(no);
+                        for (var i = 0; i < no.vizinhos.length; i++) {
+                            var vertice = no.vizinhos[i].nome;
+                            if (grafo[vertice].aberto) {
+                                grafo[vertice].aberto = false;
+                                if (grafo[vertice].nome === fim) {
                                     return false;
                                 }
                                 fila.push(grafo[vertice]);
-                                console.log(grafo[vertice]);
                             } else if (fila.indexOf(grafo[vertice])) {
-                                grafo[vertice].visita = 2;
-                                if (grafo[vertice].relIdObj == fim) {
+                                grafo[vertice].aberto = false;
+                                if (grafo[vertice].nome === fim) {
                                     console.log(grafo[vertice]);
                                     return false;
                                 }
@@ -429,25 +467,29 @@
                 } else {
                     console.log(grafo[inicio]);
                 }
+
+                console.log(caminho);
+
+                return caminho;
             }
 
             function _DFS(ini) {
 
-                grafo[i].visita = 2;
-                if (grafo[i].relIdObj === final) {
+                grafo[i].aberto = 2;
+                if (grafo[i].nome === final) {
                     console.log(grafo[i]);
-                    saiu = 1;
+                    stop = true;
                 }
-                if (grafo[i].relIdObj !== final && saiu === 0) {
-                    for (var j = 0; j < grafo[i].filhosObj.length; j++) {
-                        var no = grafo[i].filhosObj[j].idVertice2;
-                        if (no === final && saiu === 0) {
+                if (grafo[i].nome !== final && !stop) {
+                    for (var j = 0; j < grafo[i].vizinhos.length; j++) {
+                        var no = grafo[i].vizinhos[j].nome;
+                        if (no === final && !stop) {
                             console.log(grafo[no]);
-                            saiu = 1;
+                            stop = true;
                         }
-                        if (grafo[no].visita !== 2 && saiu === 0) {
+                        if (grafo[no].aberto !== 2 && !stop) {
                             console.log(grafo[no]);
-                            _DFS(grafo, grafo[no].relIdObj, final);
+                            _DFS(grafo, grafo[no].nome, final);
                         }
                     }
                 }
@@ -467,9 +509,9 @@
                     }
                 }).then(function (resposta) {
                     if (resposta[0]) {
-                        _BFS(resposta[1]);
+                        _BFS(resposta[1], data.grafo.vertices[data.grafo.vertices.length - 1]);
                     } else {
-                        _DFS(resposta[1]);
+                        _DFS(resposta[1], data.grafo.vertices[data.grafo.vertices.length - 1]);
                     }
                 });
                 return false;
@@ -488,8 +530,6 @@
 
                 var vertices = [];
 
-                var infinite = Math.pow(2, 53);
-
                 function _isOpenAndNotInfinite() {
                     var response = false;
                     angular.forEach(vertices, function (vertice, index) {
@@ -505,7 +545,7 @@
                 function _rtVizinhos(nome) {
                     var vizinhos = [];
                     console.log(nome);
-                    var arestas = fn.rtArestas(nome);
+                    var arestas = fn.rtArestas(nome, false);
                     angular.forEach(arestas, function (aresta, index) {
                         vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
                     });
