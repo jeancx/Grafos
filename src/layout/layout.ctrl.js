@@ -407,6 +407,8 @@
             function isOpenAndNotInfinite() {
                 var response = false;
                 angular.forEach(vertices, function (vertice, index) {
+                    console.log(vertice.aberto, vertice.distancia);
+                    console.log(vertice.aberto && vertice.distancia < infinite);
                     if (vertice.aberto && vertice.distancia < infinite) {
                         response = true;
                     }
@@ -414,61 +416,75 @@
                 return response;
             }
 
-            function notExist() {
-
-
-            }
-
             function rtVizinhos(nome) {
                 var vizinhos = [];
-                var atualArestas = fn.rtArestas(nome, false);
-                angular.forEach(atualArestas, function (aresta, index) {
-                    if(notExist(aresta[1])){
-                        vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
-                    }
-                    if(!data.grafo.direcionado && notExist(aresta[0])){
-                        vizinhos.push({nome: aresta[0], peso: aresta[2], distancia: infinite});
-                    }
+                angular.forEach(fn.rtArestas(nome, false), function (aresta, index) {
+                    vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
                 });
                 return vizinhos;
             }
 
-            function setVizinho(nome, distancia) {
+            function setVizinho(nome, anterior, distancia, atual) {
                 angular.forEach(vertices, function (vertice, index) {
                     if (vertice.nome === nome) {
                         vertice.distancia = distancia;
-                        vertice.anterior = nome;
-                        vertice.atual = true;
-                    } else {
-                        vertice.atual = false;
+                        vertice.anterior = anterior;
+                        vertice.atual = atual;
                     }
                 });
             }
 
-            // Enquanto existir algum vértice aberto com distância não infinita
-            while (isOpenAndNotInfinite()) {
+            function setFechado(nome) {
                 angular.forEach(vertices, function (vertice, index) {
-                    if (vertice.atual) {
-                        // Para cada vizinhos do vértices atual
-                        var vizinhos = rtVizinhos(vertice.nome);
-                        console.log(vizinhos);
-                        var set = false;
-                        angular.forEach(vizinhos, function (vizinho, index) {
-                            // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
-                            if (!set && vizinho.distancia > (vertice.distancia + vizinho.peso)) {
-                                //      Atribuir esta nova distância ao vizinho
-                                //      Definir como vértice anterior deste vizinho o vértice atual
-                                setVizinho(vizinho.nome, vizinho.peso);
-                                set = true;
-                            }
-                        });
-                        // Marcar o vértice atual como fechado
-                        vertice.aberto = false;
-
-                        // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
+                    if (vertice.nome === nome) {
+                        vertices[index].aberto = false;
                     }
                 });
+            }
 
+            function rtVerticeAtual() {
+                var atual = {};
+                angular.forEach(vertices, function (vertice, index) {
+                    if (vertice.atual) {
+                        atual = vertice;
+                    }
+                });
+                return atual;
+            }
+
+            var countLoop = 0;
+
+            // Enquanto existir algum vértice aberto com distância não infinita
+            while (isOpenAndNotInfinite() && countLoop < 50) {
+                var atual = rtVerticeAtual();
+                console.log(atual);
+                // Para cada vizinhos do vértices atual
+                var vizinhos = rtVizinhos(atual.nome);
+                console.log(vizinhos);
+                var menorPeso = {
+                    nome: '',
+                    anterior: null,
+                    distancia: infinite
+                };
+                angular.forEach(vizinhos, function (vizinho, index) {
+                    // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
+                    if (vizinho.distancia > (atual.distancia + vizinho.peso)) {
+                        // Atribuir esta nova distância ao vizinho
+                        // Definir como vértice anterior deste vizinho o vértice atual
+                        //setVizinho(vizinho.nome, atual.nome, (atual.distancia + vizinho.peso), false);
+                        if ((atual.distancia + vizinho.peso) < menorPeso.distancia) {
+                            menorPeso.nome = vizinho.nome;
+                            menorPeso.distancia = atual.distancia + vizinho.peso;
+                            menorPeso.anterior = atual.nome;
+                        }
+                    }
+                });
+                // Marcar o vértice atual como fechado
+                setFechado(atual.nome);
+                // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
+                setVizinho(menorPeso.nome, menorPeso.anterior, menorPeso.distancia, true);
+
+                countLoop++;
             }
 
             $mdDialog.show({
@@ -523,24 +539,17 @@
             };
             data.historico = [];
 
-            //GRAFO K4
             $timeout(function () {
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addAresta('A', 'B', 1);
-                fn.addAresta('A', 'C', 2);
-                fn.addAresta('A', 'D', 3);
-                fn.addAresta('B', 'A', 4);
-                fn.addAresta('B', 'C', 5);
-                fn.addAresta('B', 'D', 2);
-                fn.addAresta('C', 'A', 3);
-                fn.addAresta('C', 'B', 2);
-                fn.addAresta('C', 'D', 5);
-                fn.addAresta('D', 'A', 6);
-                fn.addAresta('D', 'B', 2);
-                fn.addAresta('D', 'C', 1);
+                fn.addVertice();
+                fn.addAresta('C', 'A', 5);
+                fn.addAresta('C', 'E', 2);
+                fn.addAresta('A', 'E', 8);
+                fn.addAresta('A', 'B', 3);
+                fn.addAresta('E', 'B', 11);
             }, 1000);
 
         };
