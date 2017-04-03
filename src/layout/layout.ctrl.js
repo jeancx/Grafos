@@ -36,6 +36,8 @@
             } else if (e.keyCode === 58 || e.keyCode === 106) {
                 $scope.$apply(fn.vrPlanaridade());
             } else if (e.keyCode === 189 || e.keyCode === 109) {
+                $scope.$apply(fn.bfs_dfs());
+            } else if (e.keyCode === 187 || e.keyCode === 107) {
                 $scope.$apply(fn.dijkstra());
             }
         };
@@ -63,6 +65,8 @@
                 fn.abrirXML();
             } else if (name == 'vrPlanaridade') { // 9
                 fn.vrPlanaridade(true);
+            } else if (name == 'bfs_dfs') { // -
+                fn.bfs_dfs();
             } else if (name == 'dijkstra') { // -
                 fn.dijkstra();
             }
@@ -265,16 +269,16 @@
         };
 
         // Retornar Arestas (Retorna todas as arestas de um vértice)
-        fn.rtArestas = function (v, showAlert) {
-            if (v) {
+        fn.rtArestas = function (nome, showAlert) {
+            if (nome) {
                 var arestas = [];
                 angular.forEach(data.grafo.arestas, function (aresta, index) {
                     if (data.grafo.direcionado) {
-                        if (v == aresta[0]) {
+                        if (nome === aresta[0]) {
                             arestas.push(aresta);
                         }
                     } else {
-                        if (aresta.indexOf(v) >= 0) {
+                        if (aresta.indexOf(nome) >= 0) {
                             arestas.push(aresta);
                         }
                     }
@@ -345,18 +349,18 @@
                         for (var a = 0; a < arestas.length; a++) {
                             if (!next) {
                                 if (!arestaAtual) {
-                                    if (arestas[a][0] == inicio) {
+                                    if (arestas[a][0] === inicio) {
                                         next = arestaAtual = arestas[a];
                                         caminho.push(arestaAtual);
                                     }
-                                } else if (arestaAtual[1] == arestas[a][0] && caminho.indexOf(arestas[a]) === -1) {
-                                    if (passos < 2 && visitados.indexOf(arestas[a][1]) == -1) {
+                                } else if (arestaAtual[1] === arestas[a][0] && caminho.indexOf(arestas[a]) === -1) {
+                                    if (passos < 2 && visitados.indexOf(arestas[a][1]) === -1) {
                                         next = arestaAtual = arestas[a];
                                         caminho.push(arestaAtual);
                                         passos++;
                                         visitados.push(arestas[a][0]);
-                                    } else if (passos == 2) {
-                                        if (arestaAtual[1] == arestas[a][0] && arestas[a][1] == inicio) {
+                                    } else if (passos === 2) {
+                                        if (arestaAtual[1] === arestas[a][0] && arestas[a][1] === inicio) {
                                             next = arestaAtual = arestas[a];
                                             caminho.push(arestaAtual);
                                             passos++;
@@ -383,18 +387,78 @@
         };
 
 
-        //Função Dijkstra
+        //Função BFS
 
-        fn.dijkstra = function (ini, fim) {
+        fn.bfs_dfs = function (ini) {
 
             var vertices = [];
 
-            var infinite = Math.pow(2, 53);
+            var saiu = 0;
+
+            function _BFS(grafo, inicio, fim) {
+
+                var fila = [];
+
+                grafo[inicio].visita = 2;
+                fila.push(grafo[inicio]);
+
+                if (inicio !== fim) {
+                    while (fila.length > 0) {
+                        var no = fila[0];
+                        fila.shift();
+                        for (var i = 0; i < no.filhosObj.length; i++) {
+                            var vertice = no.filhosObj[i].idVertice2;
+                            if (grafo[vertice].visita != 2) {
+                                grafo[vertice].visita = 2;
+                                if (grafo[vertice].relIdObj == fim) {
+                                    console.log(grafo[vertice]);
+                                    return false;
+                                }
+                                fila.push(grafo[vertice]);
+                                console.log(grafo[vertice]);
+                            } else if (fila.indexOf(grafo[vertice])) {
+                                grafo[vertice].visita = 2;
+                                if (grafo[vertice].relIdObj == fim) {
+                                    console.log(grafo[vertice]);
+                                    return false;
+                                }
+                                console.log(grafo[vertice]);
+                            }
+                        }
+                    }
+                } else {
+                    console.log(grafo[inicio]);
+                }
+            }
+
+            function _DFS(ini) {
+
+                grafo[i].visita = 2;
+                if (grafo[i].relIdObj === final) {
+                    console.log(grafo[i]);
+                    saiu = 1;
+                }
+                if (grafo[i].relIdObj !== final && saiu === 0) {
+                    for (var j = 0; j < grafo[i].filhosObj.length; j++) {
+                        var no = grafo[i].filhosObj[j].idVertice2;
+                        if (no === final && saiu === 0) {
+                            console.log(grafo[no]);
+                            saiu = 1;
+                        }
+                        if (grafo[no].visita !== 2 && saiu === 0) {
+                            console.log(grafo[no]);
+                            _DFS(grafo, grafo[no].relIdObj, final);
+                        }
+                    }
+                }
+
+            }
+
 
             if (!ini) {
                 $mdDialog.show({
                     controller: DialogCtrl,
-                    templateUrl: 'src/layout/dialogs/fnDijsktra.html',
+                    templateUrl: 'src/layout/dialogs/setBfsDfs.html',
                     parent: angular.element(document.body),
                     clickOutsideToClose: true,
                     locals: {
@@ -402,11 +466,79 @@
                         fn: fn
                     }
                 }).then(function (resposta) {
-                    if (resposta && resposta[0] && resposta[1]) {
-                        fn.dijkstra(resposta[0]);
+                    if (resposta[0]) {
+                        _BFS(resposta[1]);
+                    } else {
+                        _DFS(resposta[1]);
                     }
                 });
+                return false;
             } else {
+                _dijkstra(ini, fim);
+            }
+
+
+        };
+
+
+        //Função Dijkstra
+        fn.dijkstra = function (ini, fim) {
+
+            function _dijkstra() {
+
+                var vertices = [];
+
+                var infinite = Math.pow(2, 53);
+
+                function _isOpenAndNotInfinite() {
+                    var response = false;
+                    angular.forEach(vertices, function (vertice, index) {
+                        console.log(vertice.aberto, vertice.distancia);
+                        console.log(vertice.aberto && vertice.distancia < infinite);
+                        if (vertice.aberto && vertice.distancia < infinite) {
+                            response = true;
+                        }
+                    });
+                    return response;
+                }
+
+                function _rtVizinhos(nome) {
+                    var vizinhos = [];
+                    console.log(nome);
+                    var arestas = fn.rtArestas(nome);
+                    angular.forEach(arestas, function (aresta, index) {
+                        vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
+                    });
+                    return vizinhos;
+                }
+
+                function _setVizinho(nome, anterior, distancia, atual) {
+                    angular.forEach(vertices, function (vertice, index) {
+                        if (vertice.nome === nome) {
+                            vertice.distancia = distancia;
+                            vertice.anterior = anterior;
+                            vertice.atual = atual;
+                        }
+                    });
+                }
+
+                function _setFechado(nome) {
+                    angular.forEach(vertices, function (vertice, index) {
+                        if (vertice.nome === nome) {
+                            vertices[index].aberto = false;
+                        }
+                    });
+                }
+
+                function _rtVerticeAtual() {
+                    var atual = {};
+                    angular.forEach(vertices, function (vertice, index) {
+                        if (vertice.atual) {
+                            atual = vertice;
+                        }
+                    });
+                    return atual;
+                }
 
                 // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
                 angular.forEach(data.grafo.vertices, function (vertice, index) {
@@ -424,23 +556,22 @@
                 var countLoop = 0;
 
                 // Enquanto existir algum vértice aberto com distância não infinita
-                while (isOpenAndNotInfinite() && countLoop < 50) {
-                    var atual = rtVerticeAtual();
-                    console.log(atual);
-                    // Para cada vizinhos do vértices atual
-                    var vizinhos = rtVizinhos(atual.nome);
-                    console.log(vizinhos);
+                while (_isOpenAndNotInfinite() && countLoop < 50) {
+                    var atual = _rtVerticeAtual();
+
                     var menorPeso = {
                         nome: '',
                         anterior: null,
                         distancia: infinite
                     };
-                    angular.forEach(vizinhos, function (vizinho, index) {
+
+                    // Para cada vizinhos do vértices atual
+                    angular.forEach(_rtVizinhos(atual.nome), function (vizinho, index) {
                         // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
                         if (vizinho.distancia > (atual.distancia + vizinho.peso)) {
                             // Atribuir esta nova distância ao vizinho
                             // Definir como vértice anterior deste vizinho o vértice atual
-                            //setVizinho(vizinho.nome, atual.nome, (atual.distancia + vizinho.peso), false);
+                            _setVizinho(vizinho.nome, atual.nome, (atual.distancia + vizinho.peso), false);
                             if ((atual.distancia + vizinho.peso) < menorPeso.distancia) {
                                 menorPeso.nome = vizinho.nome;
                                 menorPeso.distancia = atual.distancia + vizinho.peso;
@@ -449,9 +580,9 @@
                         }
                     });
                     // Marcar o vértice atual como fechado
-                    setFechado(atual.nome);
+                    _setFechado(atual.nome);
                     // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
-                    setVizinho(menorPeso.nome, menorPeso.anterior, menorPeso.distancia, true);
+                    _setVizinho(menorPeso.nome, menorPeso.anterior, menorPeso.distancia, true);
 
                     countLoop++;
                 }
@@ -460,7 +591,6 @@
                     controller: DialogCtrl,
                     templateUrl: 'src/layout/dialogs/printDijkstra.html',
                     parent: angular.element(document.body),
-                    clickOutsideToClose: true,
                     locals: {
                         grafo: vertices,
                         fn: fn
@@ -469,53 +599,26 @@
 
             }
 
-            function isOpenAndNotInfinite() {
-                var response = false;
-                angular.forEach(vertices, function (vertice, index) {
-                    console.log(vertice.aberto, vertice.distancia);
-                    console.log(vertice.aberto && vertice.distancia < infinite);
-                    if (vertice.aberto && vertice.distancia < infinite) {
-                        response = true;
+
+            if (!ini) {
+                $mdDialog.show({
+                    controller: DialogCtrl,
+                    templateUrl: 'src/layout/dialogs/fnDijsktra.html',
+                    parent: angular.element(document.body),
+                    clickOutsideToClose: true,
+                    locals: {
+                        grafo: data.grafo,
+                        fn: fn
                     }
+                }).then(function (resposta) {
+                    console.log(resposta);
+                    _dijkstra(resposta[0], resposta[1]);
                 });
-                return response;
+                return false;
+            } else {
+                _dijkstra(ini, fim);
             }
 
-            function rtVizinhos(nome) {
-                var vizinhos = [];
-                angular.forEach(fn.rtArestas(nome, false), function (aresta, index) {
-                    vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
-                });
-                return vizinhos;
-            }
-
-            function setVizinho(nome, anterior, distancia, atual) {
-                angular.forEach(vertices, function (vertice, index) {
-                    if (vertice.nome === nome) {
-                        vertice.distancia = distancia;
-                        vertice.anterior = anterior;
-                        vertice.atual = atual;
-                    }
-                });
-            }
-
-            function setFechado(nome) {
-                angular.forEach(vertices, function (vertice, index) {
-                    if (vertice.nome === nome) {
-                        vertices[index].aberto = false;
-                    }
-                });
-            }
-
-            function rtVerticeAtual() {
-                var atual = {};
-                angular.forEach(vertices, function (vertice, index) {
-                    if (vertice.atual) {
-                        atual = vertice;
-                    }
-                });
-                return atual;
-            }
 
         };
 
