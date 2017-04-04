@@ -433,9 +433,10 @@
 
             var stop = false;
 
+            var caminho = [];
+
             function _BFS(inicio, fim) {
 
-                var caminho = [];
                 var fila = [];
 
                 grafo[inicio].aberto = true;
@@ -473,31 +474,39 @@
                     console.log(grafo[inicio]);
                 }
 
-                console.log(caminho);
+                fn.alert(JSON.stringify(caminho));
 
-                return caminho;
             }
 
-            function _DFS(ini) {
+            function _DFS(pos, final) {
 
-                grafo[i].aberto = 2;
-                if (grafo[i].nome === final) {
-                    console.log(grafo[i]);
+                caminho.push({nome: grafo[pos].nome});
+
+                console.log(grafo[pos]);
+
+                grafo[pos].aberto = false;
+
+                if (grafo[pos].nome === final) {
+                    console.log(grafo[pos]);
                     stop = true;
                 }
-                if (grafo[i].nome !== final && !stop) {
-                    for (var j = 0; j < grafo[i].vizinhos.length; j++) {
-                        var no = grafo[i].vizinhos[j].nome;
+                if (grafo[pos].nome !== final && !stop) {
+                    for (var j = 0; j < grafo[pos].vizinhos.length; j++) {
+                        var no = grafo[pos].vizinhos[j].nome;
+                        console.log(grafo[pos].vizinhos[j]);
+                        caminho.push({nome: grafo[pos].vizinhos[j].nome, peso: grafo[pos].vizinhos[j].peso});
                         if (no === final && !stop) {
-                            console.log(grafo[no]);
                             stop = true;
                         }
-                        if (grafo[no].aberto !== 2 && !stop) {
-                            console.log(grafo[no]);
-                            _DFS(grafo, grafo[no].nome, final);
+                        if (grafo[no].aberto && !stop) {
+                            _DFS(grafo[no].nome, final);
                         }
                     }
                 }
+
+                console.log(JSON.stringify(caminho));
+
+                fn.alert(JSON.stringify(caminho));
 
             }
 
@@ -516,7 +525,7 @@
                     if (resposta[0]) {
                         _BFS(resposta[1], data.grafo.vertices[data.grafo.vertices.length - 1]);
                     } else {
-                        _DFS(resposta[1], data.grafo.vertices[data.grafo.vertices.length - 1]);
+                        _DFS(resposta[1], data.grafo.vertices[data.grafo.vertices.length - 1], []);
                     }
                 });
                 return false;
