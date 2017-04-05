@@ -559,12 +559,14 @@
 
                 caminho.push(grafo[ini].nome);
 
+                var cont = 0;
+
                 function _isOpenAndNotInfinite() {
-                    console.log(stop);
-                    if (stop) {
+                    cont++;
+                    if (stop || cont > 99) {
                         return false;
                     }
-                    for (var i = 0; vertices.length; i++) {
+                    for (var i = 0; i < vertices.length; i++) {
                         if (grafo[vertices[i]].aberto && grafo[vertices[i]].distancia < infinite) {
                             return true;
                         }
@@ -573,7 +575,7 @@
                 }
 
                 function _rtVerticeAtual() {
-                    for (var i = 0; vertices.length; i++) {
+                    for (var i = 0; i < vertices.length; i++) {
                         if (grafo[vertices[i]].atual) {
                             return grafo[vertices[i]];
                         }
@@ -586,7 +588,7 @@
                 while (_isOpenAndNotInfinite()) {
                     var atual = _rtVerticeAtual();
 
-                    //console.log(cont++);
+                    console.log(atual.nome);
 
                     if (atual.nome === fim) {
                         stop = true;
@@ -602,7 +604,6 @@
                         // Para cada vizinhos do vértices atual
                         var vizinhos = grafo[atual.nome].vizinhos;
                         if (vizinhos && vizinhos.length > 0) {
-                            console.log(vizinhos.length);
                             for (var i = 0; i < vizinhos.length; i++) {
                                 if (vizinhos[i] && vizinhos[i].distancia) {
                                     if (vizinhos[i].nome === fim) {
@@ -612,6 +613,7 @@
                                         menor.anterior = atual.nome;
                                     }
                                     // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
+                                    console.log(vizinhos[i].distancia);
                                     if (!stop && grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
                                         // Atribuir esta nova distância ao vizinho
                                         // Definir como vértice anterior deste vizinho o vértice atual
@@ -630,8 +632,10 @@
                             }
                         }
                     }
+
                     // Marcar o vértice atual como fechado
                     grafo[atual.nome].aberto = false;
+                    grafo[atual.nome].atual = false;
 
                     if (menor && menor.nome) {
                         caminho.push(menor);
@@ -642,19 +646,23 @@
                         grafo[menor.nome].atual = true;
                     }
 
-
                 }
 
-                console.log(caminho);
+                console.log(JSON.stringify(caminho));
                 console.log(grafo);
+
+                var djikstra = [];
+
+                for (var i = 0; i < vertices.length; i++) {
+                    djikstra.push(grafo[vertices[i]]);
+                }
 
                 $mdDialog.show({
                     controller: DialogCtrl,
                     templateUrl: 'src/layout/dialogs/printDijkstra.html',
                     parent: angular.element(document.body),
-                    clickOutsideToClose: true,
                     locals: {
-                        grafo: grafo,
+                        grafo: djikstra,
                         fn: fn
                     }
                 });
@@ -745,13 +753,10 @@
 
     function DialogCtrl($scope, $mdDialog, grafo, fn) {
 
-        var data = {};
         $scope.fn = fn;
-        $scope.data = data;
         $scope.grafo = grafo;
-        console.log($scope.grafo);
-        data.grafo = grafo;
-        data.pesos = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        $scope.pesos = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+        console.log(grafo);
 
         $scope.cancela = function () {
             $mdDialog.hide();

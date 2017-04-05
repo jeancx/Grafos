@@ -1,56 +1,51 @@
 <md-dialog aria-label="Dijkstra">
-    <form ng-cloak>
-        <md-toolbar>
-            <div class="md-toolbar-tools">
-                <h2>Dijkstra</h2>
-                <span flex></span>
-                <md-button class="md-icon-button" ng-click="cancela()">
-                    <md-icon aria-label="Fechar">close</md-icon>
-                </md-button>
-            </div>
-        </md-toolbar>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Dijkstra</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancela()">
+                <md-icon aria-label="Fechar">close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
 
-        <md-dialog-content>
-            <md-content layout-padding>
+    <md-dialog-content>
+        <md-content layout-padding>
 
-                <table>
+            <table>
 
-                    <tr>
-                        <th></th>
-                        <th ng-repeat="v in grafo">
-                            <span>{{v.nome}}</span>
-                        </th>
-                    </tr>
+                <tr>
+                    <th></th>
+                    <th ng-repeat="v in grafo">
+                        <span>{{v.nome}}</span>
+                    </th>
+                </tr>
 
-                    <tr>
-                        <th>Distância</th>
-                        <th ng-repeat="v in grafo">
-                            <span ng-if="v.distancia == 9007199254740992">∞</span>
-                            <span ng-if="v.distancia < 9007199254740992">{{v.distancia}}</span>
-                        </th>
-                    </tr>
+                <tr>
+                    <th>Distância</th>
+                    <th ng-repeat="v in grafo">
+                        <span ng-if="v.distancia == 9007199254740992">∞</span>
+                        <span ng-if="v.distancia < 9007199254740992">{{v.distancia}}</span>
+                    </th>
+                </tr>
 
-                    <tr>
-                        <th>Anterior</th>
-                        <th ng-repeat="v in grafo">
-                            <span ng-if="v.anterior === null">-</span>
-                            <span ng-if="v.anterior">{{v.anterior}}</span>
-                        </th>
-                    </tr>
+                <tr>
+                    <th>Anterior</th>
+                    <th ng-repeat="v in grafo">
+                        <span ng-if="v.anterior === null">-</span>
+                        <span ng-if="v.anterior">{{v.anterior}}</span>
+                    </th>
+                </tr>
 
-                    <tr>
-                        <th>Fechado</th>
-                        <th ng-repeat="v in grafo">
-                            <span>{{v.aberto ? 'Y' : 'N'}}</span>
-                        </th>
-                    </tr>
+                <tr>
+                    <th>Fechado</th>
+                    <th ng-repeat="v in grafo">
+                        <span>{{v.aberto ? 'Y' : 'N'}}</span>
+                    </th>
+                </tr>
 
-                </table>
+            </table>
 
-                {{data.grafo}}
-
-            </md-content>
-        </md-dialog-content>
-
-    </form>
+        </md-content>
+    </md-dialog-content>
 </md-dialog>
