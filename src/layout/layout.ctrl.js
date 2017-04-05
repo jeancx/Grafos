@@ -560,6 +560,7 @@
                 caminho.push(grafo[ini].nome);
 
                 function _isOpenAndNotInfinite() {
+                    console.log(stop);
                     if (stop) {
                         return false;
                     }
@@ -571,25 +572,21 @@
                     return false;
                 }
 
-                function _setVizinho(nome, anterior, distancia, atual) {
-                    caminho.push(grafo[ini].nome);
-                    grafo[nome].distancia = distancia;
-                    grafo[nome].anterior = anterior;
-                    grafo[nome].atual = atual;
-                }
-
                 function _rtVerticeAtual() {
                     for (var i = 0; vertices.length; i++) {
                         if (grafo[vertices[i]].atual) {
                             return grafo[vertices[i]];
                         }
                     }
-                    return {};
+                    stop = true;
                 }
 
+                var cont = 0;
                 // Enquanto existir algum vértice aberto com distância não infinita
                 while (_isOpenAndNotInfinite()) {
                     var atual = _rtVerticeAtual();
+
+                    //console.log(cont++);
 
                     if (atual.nome === fim) {
                         stop = true;
@@ -606,7 +603,7 @@
                         var vizinhos = grafo[atual.nome].vizinhos;
                         if (vizinhos && vizinhos.length > 0) {
                             console.log(vizinhos.length);
-                            for (var i = 0; vizinhos.length; i++) {
+                            for (var i = 0; i < vizinhos.length; i++) {
                                 if (vizinhos[i] && vizinhos[i].distancia) {
                                     if (vizinhos[i].nome === fim) {
                                         stop = true;
@@ -618,7 +615,11 @@
                                     if (!stop && grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
                                         // Atribuir esta nova distância ao vizinho
                                         // Definir como vértice anterior deste vizinho o vértice atual
-                                        _setVizinho(vizinhos[i].nome, atual.nome, (atual.distancia + vizinhos[i].peso), false);
+                                        caminho.push(grafo[ini].nome);
+                                        grafo[vizinhos[i].nome].distancia = atual.distancia + vizinhos[i].peso;
+                                        grafo[vizinhos[i].nome].anterior = atual.nome;
+                                        grafo[vizinhos[i].nome].atual = false;
+
                                         if ((atual.distancia + vizinhos[i].peso) < menor.distancia) {
                                             menor.nome = vizinhos[i].nome;
                                             menor.distancia = atual.distancia + vizinhos[i].peso;
@@ -632,25 +633,28 @@
                     // Marcar o vértice atual como fechado
                     grafo[atual.nome].aberto = false;
 
-                    console.log(menor);
-
                     if (menor && menor.nome) {
                         caminho.push(menor);
                         // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
-                        _setVizinho(menor.nome, menor.anterior, menor.distancia, true);
+                        caminho.push(grafo[ini].nome);
+                        grafo[menor.nome].distancia = menor.distancia;
+                        grafo[menor.nome].anterior = menor.anterior;
+                        grafo[menor.nome].atual = true;
                     }
 
 
                 }
 
+                console.log(caminho);
                 console.log(grafo);
 
                 $mdDialog.show({
                     controller: DialogCtrl,
                     templateUrl: 'src/layout/dialogs/printDijkstra.html',
                     parent: angular.element(document.body),
+                    clickOutsideToClose: true,
                     locals: {
-                        grafo: caminho,
+                        grafo: grafo,
                         fn: fn
                     }
                 });
@@ -741,11 +745,11 @@
 
     function DialogCtrl($scope, $mdDialog, grafo, fn) {
 
-        $scope.grafo = grafo;
-
         var data = {};
         $scope.fn = fn;
         $scope.data = data;
+        $scope.grafo = grafo;
+        console.log($scope.grafo);
         data.grafo = grafo;
         data.pesos = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 
