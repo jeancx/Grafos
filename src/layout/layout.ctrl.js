@@ -157,9 +157,9 @@
                         grafo: data.grafo,
                         fn: fn
                     }
-                }).then(function (resposta, resposta2) {
+                }).then(function (resposta) {
                     if (resposta && resposta[0] && resposta[1]) {
-                        fn.addAresta(resposta[0], resposta[1], resposta2);
+                        fn.addAresta(resposta[0], resposta[1], resposta[2]);
                     }
                 });
             }
@@ -583,12 +583,9 @@
                     stop = true;
                 }
 
-                var cont = 0;
                 // Enquanto existir algum vértice aberto com distância não infinita
                 while (_isOpenAndNotInfinite()) {
                     var atual = _rtVerticeAtual();
-
-                    console.log(atual.nome);
 
                     if (atual.nome === fim) {
                         stop = true;
@@ -762,8 +759,8 @@
             $mdDialog.hide();
         };
 
-        $scope.confirma = function (resposta, resposta2) {
-            $mdDialog.hide(resposta, resposta2);
+        $scope.confirma = function (resposta) {
+            $mdDialog.hide(resposta);
         };
 
     }
