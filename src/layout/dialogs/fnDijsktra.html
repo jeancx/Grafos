@@ -16,14 +16,14 @@
                 <div layout="row">
                     <md-input-container flex>
                         <label>Início</label>
-                        <md-select ng-model="a">
+                        <md-select ng-model="a" ng-init="a = grafo.vertices[0]">
                             <md-option ng-repeat="item in grafo.vertices" ng-value="item">{{item}}</md-option>
                         </md-select>
                     </md-input-container>
 
                     <md-input-container flex>
                         <label>Fim</label>
-                        <md-select ng-model="b" >
+                        <md-select ng-model="b" ng-init="b = grafo.vertices[grafo.vertices.length - 1]" >
                             <md-option ng-repeat="item in grafo.vertices" ng-value="item">{{item}}</md-option>
                         </md-select>
                     </md-input-container>

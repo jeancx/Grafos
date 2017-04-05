@@ -438,35 +438,32 @@
             function _BFS(inicio, fim) {
 
                 var fila = [];
-
                 grafo[inicio].aberto = true;
-
                 // Definir um vértice inicial como atual
-                fila.push(grafo[inicio]);
-                caminho.push(grafo[inicio].nome);
+                fila.push(grafo[inicio].nome);
+                caminho.push({nome: grafo[inicio].nome});
 
                 if (inicio !== fim) {
                     while (fila.length > 0) {
-                        var no = fila[0];
+                        var no = grafo[fila[0]];
                         fila.shift();
                         for (var i = 0; i < no.vizinhos.length; i++) {
-                            var vertice = no.vizinhos[i].nome;
-                            if (grafo[vertice].aberto) {
-                                grafo[vertice].aberto = false;
-                                caminho.push(grafo[vertice].nome);
-                                console.log(grafo[vertice].nome);
-                                if (grafo[vertice].nome === fim) {
+                            var vizinho = no.vizinhos[i];
+                            if (grafo[vizinho.nome].aberto) {
+                                grafo[vizinho.nome].aberto = false;
+                                caminho.push({nome: vizinho.nome, peso: vizinho.peso});
+                                console.log(grafo[vizinho.nome]);
+                                if (grafo[vizinho.nome].nome === fim) {
                                     return false;
                                 }
-                                fila.push(grafo[vertice]);
-                            } else if (fila.indexOf(grafo[vertice])) {
-                                grafo[vertice].aberto = false;
-                                caminho.push(grafo[vertice].nome);
-                                console.log(grafo[vertice].nome);
-                                if (grafo[vertice].nome === fim) {
+                                fila.push(grafo[vizinho.nome].nome);
+                            } else if (fila.indexOf(grafo[vizinho.nome])) {
+                                grafo[vizinho.nome].aberto = false;
+                                caminho.push(grafo[vizinho.nome].nome);
+                                caminho.push({nome: vizinho.nome, peso: vizinho.peso});
+                                if (grafo[vizinho.nome].nome === fim) {
                                     return false;
                                 }
-                                console.log(grafo[vertice]);
                             }
                         }
                     }
@@ -491,17 +488,24 @@
                     stop = true;
                 }
                 if (grafo[pos].nome !== final && !stop) {
+                    // var menor = {nome: '', peso: infinite};
                     for (var j = 0; j < grafo[pos].vizinhos.length; j++) {
-                        var no = grafo[pos].vizinhos[j].nome;
-                        console.log(grafo[pos].vizinhos[j]);
-                        caminho.push({nome: grafo[pos].vizinhos[j].nome, peso: grafo[pos].vizinhos[j].peso});
-                        if (no === final && !stop) {
+                        var no = grafo[pos].vizinhos[j];
+                        console.log(no);
+                        if (no.nome === final && !stop) {
                             stop = true;
                         }
-                        if (grafo[no].aberto && !stop) {
-                            _DFS(grafo[no].nome, final);
+                        // if(!stop && no.peso < menor.peso && grafo[no.nome].aberto){
+                        //     menor = {nome: no.nome, peso: no.peso};
+                        // }
+                        if (grafo[no.nome].aberto && !stop) {
+                            _DFS(grafo[no.nome].nome, final);
                         }
                     }
+                    // if(!stop && menor.nome){
+                    //     caminho.push(menor);
+                    //     _DFS(grafo[menor.nome].nome, final);
+                    // }
                 }
 
                 console.log(JSON.stringify(caminho));
@@ -540,113 +544,113 @@
         //Função Dijkstra
         fn.dijkstra = function (ini, fim) {
 
-            function _dijkstra() {
+            // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
+            var grafo = fn.startGrafo();
+            var stop = false;
+            var caminho = [];
+            var vertices = data.grafo.vertices;
 
-                var vertices = [];
+            function _dijkstra(ini, fim) {
+
+                // Definir o vértice inicial como vértice atual
+                grafo[ini].atual = true;
+                // Definir a distância do vértice atual como zero
+                grafo[ini].distancia = 0;
+
+                caminho.push(grafo[ini].nome);
 
                 function _isOpenAndNotInfinite() {
-                    var response = false;
-                    angular.forEach(vertices, function (vertice, index) {
-                        console.log(vertice.aberto, vertice.distancia);
-                        console.log(vertice.aberto && vertice.distancia < infinite);
-                        if (vertice.aberto && vertice.distancia < infinite) {
-                            response = true;
+                    if (stop) {
+                        return false;
+                    }
+                    for (var i = 0; vertices.length; i++) {
+                        if (grafo[vertices[i]].aberto && grafo[vertices[i]].distancia < infinite) {
+                            return true;
                         }
-                    });
-                    return response;
-                }
-
-                function _rtVizinhos(nome) {
-                    var vizinhos = [];
-                    console.log(nome);
-                    var arestas = fn.rtArestas(nome, false);
-                    angular.forEach(arestas, function (aresta, index) {
-                        vizinhos.push({nome: aresta[1], peso: aresta[2], distancia: infinite});
-                    });
-                    return vizinhos;
+                    }
+                    return false;
                 }
 
                 function _setVizinho(nome, anterior, distancia, atual) {
-                    angular.forEach(vertices, function (vertice, index) {
-                        if (vertice.nome === nome) {
-                            vertice.distancia = distancia;
-                            vertice.anterior = anterior;
-                            vertice.atual = atual;
-                        }
-                    });
-                }
-
-                function _setFechado(nome) {
-                    angular.forEach(vertices, function (vertice, index) {
-                        if (vertice.nome === nome) {
-                            vertices[index].aberto = false;
-                        }
-                    });
+                    caminho.push(grafo[ini].nome);
+                    grafo[nome].distancia = distancia;
+                    grafo[nome].anterior = anterior;
+                    grafo[nome].atual = atual;
                 }
 
                 function _rtVerticeAtual() {
-                    var atual = {};
-                    angular.forEach(vertices, function (vertice, index) {
-                        if (vertice.atual) {
-                            atual = vertice;
+                    for (var i = 0; vertices.length; i++) {
+                        if (grafo[vertices[i]].atual) {
+                            return grafo[vertices[i]];
                         }
-                    });
-                    return atual;
+                    }
+                    return {};
                 }
 
-                // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
-                angular.forEach(data.grafo.vertices, function (vertice, index) {
-                    vertices.push({
-                        aberto: true,
-                        anterior: null,
-                        // Definir a distância do vértice atual como zero
-                        distancia: index === 0 ? 0 : infinite,
-                        nome: vertice,
-                        // Definir o vértice inicial como vértice atual
-                        atual: ini === vertice.nome
-                    });
-                });
-
-                var countLoop = 0;
-
                 // Enquanto existir algum vértice aberto com distância não infinita
-                while (_isOpenAndNotInfinite() && countLoop < 50) {
+                while (_isOpenAndNotInfinite()) {
                     var atual = _rtVerticeAtual();
 
-                    var menorPeso = {
+                    if (atual.nome === fim) {
+                        stop = true;
+                    }
+
+                    var menor = {
                         nome: '',
                         anterior: null,
                         distancia: infinite
                     };
 
-                    // Para cada vizinhos do vértices atual
-                    angular.forEach(_rtVizinhos(atual.nome), function (vizinho, index) {
-                        // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
-                        if (vizinho.distancia > (atual.distancia + vizinho.peso)) {
-                            // Atribuir esta nova distância ao vizinho
-                            // Definir como vértice anterior deste vizinho o vértice atual
-                            _setVizinho(vizinho.nome, atual.nome, (atual.distancia + vizinho.peso), false);
-                            if ((atual.distancia + vizinho.peso) < menorPeso.distancia) {
-                                menorPeso.nome = vizinho.nome;
-                                menorPeso.distancia = atual.distancia + vizinho.peso;
-                                menorPeso.anterior = atual.nome;
+                    if (!stop) {
+                        // Para cada vizinhos do vértices atual
+                        var vizinhos = grafo[atual.nome].vizinhos;
+                        if (vizinhos && vizinhos.length > 0) {
+                            console.log(vizinhos.length);
+                            for (var i = 0; vizinhos.length; i++) {
+                                if (vizinhos[i] && vizinhos[i].distancia) {
+                                    if (vizinhos[i].nome === fim) {
+                                        stop = true;
+                                        menor.nome = vizinhos[i].nome;
+                                        menor.distancia = atual.distancia + vizinhos[i].peso;
+                                        menor.anterior = atual.nome;
+                                    }
+                                    // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
+                                    if (!stop && grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
+                                        // Atribuir esta nova distância ao vizinho
+                                        // Definir como vértice anterior deste vizinho o vértice atual
+                                        _setVizinho(vizinhos[i].nome, atual.nome, (atual.distancia + vizinhos[i].peso), false);
+                                        if ((atual.distancia + vizinhos[i].peso) < menor.distancia) {
+                                            menor.nome = vizinhos[i].nome;
+                                            menor.distancia = atual.distancia + vizinhos[i].peso;
+                                            menor.anterior = atual.nome;
+                                        }
+                                    }
+                                }
                             }
                         }
-                    });
+                    }
                     // Marcar o vértice atual como fechado
-                    _setFechado(atual.nome);
-                    // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
-                    _setVizinho(menorPeso.nome, menorPeso.anterior, menorPeso.distancia, true);
+                    grafo[atual.nome].aberto = false;
 
-                    countLoop++;
+                    console.log(menor);
+
+                    if (menor && menor.nome) {
+                        caminho.push(menor);
+                        // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
+                        _setVizinho(menor.nome, menor.anterior, menor.distancia, true);
+                    }
+
+
                 }
+
+                console.log(grafo);
 
                 $mdDialog.show({
                     controller: DialogCtrl,
                     templateUrl: 'src/layout/dialogs/printDijkstra.html',
                     parent: angular.element(document.body),
                     locals: {
-                        grafo: vertices,
+                        grafo: caminho,
                         fn: fn
                     }
                 });
@@ -665,7 +669,6 @@
                         fn: fn
                     }
                 }).then(function (resposta) {
-                    console.log(resposta);
                     _dijkstra(resposta[0], resposta[1]);
                 });
                 return false;
