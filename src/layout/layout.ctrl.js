@@ -452,8 +452,9 @@
                             if (grafo[vizinho.nome].aberto) {
                                 grafo[vizinho.nome].aberto = false;
                                 caminho.push({nome: vizinho.nome, peso: vizinho.peso});
-                                console.log(grafo[vizinho.nome]);
+                                //console.log(grafo[vizinho.nome]);
                                 if (grafo[vizinho.nome].nome === fim) {
+                                    fn.alert(JSON.stringify(caminho));
                                     return false;
                                 }
                                 fila.push(grafo[vizinho.nome].nome);
@@ -462,6 +463,7 @@
                                 caminho.push(grafo[vizinho.nome].nome);
                                 caminho.push({nome: vizinho.nome, peso: vizinho.peso});
                                 if (grafo[vizinho.nome].nome === fim) {
+                                    fn.alert(JSON.stringify(caminho));
                                     return false;
                                 }
                             }
@@ -470,9 +472,7 @@
                 } else {
                     console.log(grafo[inicio]);
                 }
-
                 fn.alert(JSON.stringify(caminho));
-
             }
 
             function _DFS(pos, final) {
@@ -580,16 +580,21 @@
                             return grafo[vertices[i]];
                         }
                     }
-                    stop = true;
+                    for (var i = 0; i < vertices.length; i++) {
+                        if (grafo[vertices[i]].aberto) {
+                            return grafo[vertices[i]];
+                        }
+                    }
+                    //stop = true;
                 }
 
                 // Enquanto existir algum vértice aberto com distância não infinita
                 while (_isOpenAndNotInfinite()) {
                     var atual = _rtVerticeAtual();
 
-                    if (atual.nome === fim) {
-                        stop = true;
-                    }
+                    // if (atual.nome === fim) {
+                    //     stop = true;
+                    // }
 
                     var menor = {
                         nome: '',
@@ -597,45 +602,44 @@
                         distancia: infinite
                     };
 
-                    if (!stop) {
-                        // Para cada vizinhos do vértices atual
-                        var vizinhos = grafo[atual.nome].vizinhos;
-                        if (vizinhos && vizinhos.length > 0) {
-                            for (var i = 0; i < vizinhos.length; i++) {
-                                if (vizinhos[i] && vizinhos[i].distancia) {
-                                    if (vizinhos[i].nome === fim) {
-                                        stop = true;
+                    //if (!stop) {
+                    // Para cada vizinhos do vértices atual
+                    var vizinhos = grafo[atual.nome].vizinhos;
+                    if (vizinhos && vizinhos.length > 0) {
+                        for (var i = 0; i < vizinhos.length; i++) {
+                            if (vizinhos[i] && vizinhos[i].distancia) {
+                                if (vizinhos[i].nome === fim) {
+                                    //stop = true;
+                                    menor.nome = vizinhos[i].nome;
+                                    menor.distancia = atual.distancia + vizinhos[i].peso;
+                                    menor.anterior = atual.nome;
+                                }
+                                // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
+                                if (!stop && grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
+                                    // Atribuir esta nova distância ao vizinho
+                                    // Definir como vértice anterior deste vizinho o vértice atual
+                                    //caminho.push(grafo[ini].nome);
+                                    grafo[vizinhos[i].nome].distancia = atual.distancia + vizinhos[i].peso;
+                                    grafo[vizinhos[i].nome].anterior = atual.nome;
+                                    grafo[vizinhos[i].nome].atual = false;
+
+                                    if ((atual.distancia + vizinhos[i].peso) < menor.distancia) {
                                         menor.nome = vizinhos[i].nome;
                                         menor.distancia = atual.distancia + vizinhos[i].peso;
                                         menor.anterior = atual.nome;
-                                    }
-                                    // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
-                                    console.log(vizinhos[i].distancia);
-                                    if (!stop && grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
-                                        // Atribuir esta nova distância ao vizinho
-                                        // Definir como vértice anterior deste vizinho o vértice atual
-                                        caminho.push(grafo[ini].nome);
-                                        grafo[vizinhos[i].nome].distancia = atual.distancia + vizinhos[i].peso;
-                                        grafo[vizinhos[i].nome].anterior = atual.nome;
-                                        grafo[vizinhos[i].nome].atual = false;
-
-                                        if ((atual.distancia + vizinhos[i].peso) < menor.distancia) {
-                                            menor.nome = vizinhos[i].nome;
-                                            menor.distancia = atual.distancia + vizinhos[i].peso;
-                                            menor.anterior = atual.nome;
-                                        }
                                     }
                                 }
                             }
                         }
                     }
+                    //}
 
                     // Marcar o vértice atual como fechado
                     grafo[atual.nome].aberto = false;
                     grafo[atual.nome].atual = false;
 
                     if (menor && menor.nome) {
-                        caminho.push(menor);
+                        caminho.push(menor.nome);
                         // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
                         caminho.push(grafo[ini].nome);
                         grafo[menor.nome].distancia = menor.distancia;
@@ -646,13 +650,14 @@
                 }
 
                 console.log(JSON.stringify(caminho));
-                console.log(grafo);
 
                 var djikstra = [];
 
                 for (var i = 0; i < vertices.length; i++) {
                     djikstra.push(grafo[vertices[i]]);
                 }
+
+                console.log(grafo);
 
                 $mdDialog.show({
                     controller: DialogCtrl,
@@ -733,13 +738,13 @@
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addAresta('C', 'A', 5);
+                fn.addAresta('A', 'B', 3);
+                fn.addAresta('A', 'C', 5);
+                fn.addAresta('A', 'D', 6);
+                fn.addAresta('B', 'D', 2);
+                fn.addAresta('B', 'E', 9);
                 fn.addAresta('C', 'E', 2);
                 fn.addAresta('A', 'E', 8);
-                fn.addAresta('A', 'B', 3);
-                fn.addAresta('A', 'D', 6);
-                fn.addAresta('E', 'B', 11);
-                fn.addAresta('B', 'D', 2);
             }, 1000);
 
         };
@@ -753,7 +758,6 @@
         $scope.fn = fn;
         $scope.grafo = grafo;
         $scope.pesos = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
-        console.log(grafo);
 
         $scope.cancela = function () {
             $mdDialog.hide();
