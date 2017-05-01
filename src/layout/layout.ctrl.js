@@ -11,6 +11,7 @@
         $scope.data = data;
         $mdSidenav("left").open();
         var infinite = Math.pow(2, 53);
+        data.graphJS = {};
 
         document.body.onkeydown = function (e) {
             console.log(e.keyCode);
@@ -406,6 +407,16 @@
                                 peso: vizinho[2]
                             });
                         }
+                        if (!data.grafo.direcionado && vizinho[1] === nome) {
+                            vizinhos.push({
+                                aberto: true,
+                                anterior: null,
+                                distancia: infinite,
+                                nome: vizinho[0],
+                                atual: false,
+                                peso: vizinho[2]
+                            });
+                        }
                     });
                 }
                 return vizinhos;
@@ -548,6 +559,7 @@
             var grafo = fn.startGrafo();
             var stop = false;
             var caminho = [];
+            var caminhos = [];
             var vertices = data.grafo.vertices;
 
             function _dijkstra(ini, fim) {
@@ -608,14 +620,14 @@
                     if (vizinhos && vizinhos.length > 0) {
                         for (var i = 0; i < vizinhos.length; i++) {
                             if (vizinhos[i] && vizinhos[i].distancia) {
-                                if (vizinhos[i].nome === fim) {
-                                    //stop = true;
-                                    menor.nome = vizinhos[i].nome;
-                                    menor.distancia = atual.distancia + vizinhos[i].peso;
-                                    menor.anterior = atual.nome;
-                                }
-                                // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
-                                if (!stop && grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
+                                // if (vizinhos[i].nome === fim) {
+                                //     //stop = true;
+                                //     menor.nome = vizinhos[i].nome;
+                                //     menor.distancia = atual.distancia + vizinhos[i].peso;
+                                //     menor.anterior = atual.nome;
+                                // } else
+                                // // Se a distância do vizinho é maior que a distância do vértice atual mais o peso da aresta que os une
+                                if (grafo[vizinhos[i].nome].aberto && vizinhos[i].distancia > (atual.distancia + vizinhos[i].peso)) {
                                     // Atribuir esta nova distância ao vizinho
                                     // Definir como vértice anterior deste vizinho o vértice atual
                                     //caminho.push(grafo[ini].nome);
@@ -641,15 +653,20 @@
                     if (menor && menor.nome) {
                         caminho.push(menor.nome);
                         // Definir o vértice aberto com a menor distância (não infinita) como o vértice atual
-                        caminho.push(grafo[ini].nome);
+                        //caminho.push(grafo[ini].nome);
                         grafo[menor.nome].distancia = menor.distancia;
                         grafo[menor.nome].anterior = menor.anterior;
                         grafo[menor.nome].atual = true;
+
+                        if (menor.nome === fim) {
+                            caminhos.push(caminho);
+                            caminho = [];
+                        }
                     }
 
                 }
 
-                console.log(JSON.stringify(caminho));
+                console.log(JSON.stringify(caminhos));
 
                 var djikstra = [];
 
@@ -657,7 +674,7 @@
                     djikstra.push(grafo[vertices[i]]);
                 }
 
-                console.log(grafo);
+                console.log(djikstra);
 
                 $mdDialog.show({
                     controller: DialogCtrl,
@@ -689,6 +706,45 @@
             } else {
                 _dijkstra(ini, fim);
             }
+
+
+        };
+
+
+        fn.graphJS = function () {
+            var s, g = {nodes: [], edges: []};
+
+            var vertices = data.grafo.vertices;
+            var arestas = data.grafo.arestas;
+
+            // Generate a random graph:
+            for (var v = 0; v < vertices.length; v++)
+                g.nodes.push({
+                    id: vertices[v],
+                    label: vertices[v],
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: 3,
+                    color: '#666'
+                });
+
+            for (var a = 0; a < arestas.length; a++)
+                g.edges.push({
+                    id: arestas[a][0]+'_'+arestas[a][1],
+                    source: arestas[a][0],
+                    target: arestas[a][1],
+                    size: arestas[a][2] ? arestas[a][2] : 1,
+                    color: '#ccc'
+                });
+
+            data.graphJS.kill();
+
+            // Instantiate sigma:
+            data.graphJS = new sigma({
+                graph: g,
+                container: 'graph-container'
+            });
+
 
 
         };
@@ -746,7 +802,9 @@
                 fn.addAresta('C', 'E', 2);
                 fn.addAresta('A', 'E', 8);
             }, 1000);
-
+            $timeout(function () {
+                data.graphJS = new sigma({graph: {},container: 'graph-container'});;
+            })
         };
 
         fn.start();
