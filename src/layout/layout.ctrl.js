@@ -12,6 +12,7 @@
         $mdSidenav("left").open();
         var infinite = Math.pow(2, 53);
         data.graphJS = {};
+        data.cores = null;
 
         document.body.onkeydown = function (e) {
             console.log(e.keyCode);
@@ -711,7 +712,7 @@
         };
 
 
-        fn.graphJS = function (arestasByGrau) {
+        fn.graphJS = function () {
             var s, g = {nodes: [], edges: []};
 
             var vertices = data.grafo.vertices;
@@ -725,7 +726,7 @@
                     x: Math.random(),
                     y: Math.random(),
                     size: 3,
-                    color: '#666'
+                    color: 'green'
                 });
             }
 
@@ -735,18 +736,8 @@
                     source: arestas[a][0],
                     target: arestas[a][1],
                     size: arestas[a][2] ? arestas[a][2] : 1,
-                    color: '#ccc'
+                    color: 'green'
                 });
-            }
-
-            if (arestasByGrau) {
-                for (var n = 0; n < g.nodes.length; n++) {
-                    for (var ag = 1; ag < arestasByGrau.length; ag++) {
-                        if (g.nodes[n].id === ag.vertice) {
-                            g.nodes[n].color = ag.cor;
-                        }
-                    }
-                }
             }
 
             data.graphJS.kill();
@@ -754,8 +745,17 @@
             // Instantiate sigma:
             data.graphJS = new sigma({
                 graph: g,
-                container: 'graph-container'
+                container: 'graph-container',
+                settings: { labelColor: 'node', labelThreshold: 0, labelSizeRatio: 4, labelSize: 'proportional' }
             });
+
+            if (data.cores) {
+                for (var ag = 1; ag < data.cores.length; ag++) {
+                    var node = data.graphJS.graph.nodes(data.cores[ag].vertice);
+                    node.color = data.cores[ag].cor;
+                }
+                data.graphJS.refresh();
+            }
         };
 
 
@@ -763,6 +763,7 @@
 
             var vertices = data.grafo.vertices;
             var arestas = data.grafo.arestas;
+            var a, v, s;
 
             //Criar um vetor de cores
             var cores = ['green', 'blue', 'yellow', 'red', 'purple'];
@@ -770,16 +771,18 @@
 
             //Ordenar os vértices pelo seu grau em ordem decrescente
             var arestasByGrau = [];
-            for (var v = 0; v < vertices.length; v++) {
+            for (v = 0; v < vertices.length; v++) {
                 arestasByGrau.push(
                     {
                         vertice: vertices[v],
                         grau: fn.rtArestas(vertices[v]).length,
                         //Inicializar todos os vértices como “sem cor”
-                        cor: '#000000'
+                        cor: null,
+                        adjacentes: fn.rtArestas(vertices[v])
                     }
                 );
             }
+
             arestasByGrau.sort(function (a, b) {
                 if (a.grau < b.grau) {
                     return 1;
@@ -790,16 +793,9 @@
                 return 0;
             });
 
-
-            var cont = 0;
-            // Enquanto o existir um vértice sem cor no grafo {
             function semCor() {
-                cont++;
-                if (cont >= 10) {
-                    return false;
-                }
                 for (var a = 0; a < arestasByGrau.length; a++) {
-                    if (arestasByGrau[a].cor === '#000000') {
+                    if (null === arestasByGrau[a].cor) {
                         return true;
                     }
                 }
@@ -808,50 +804,40 @@
 
             function isMesmaCor(adjacentes, cor) {
                 for (var a = 0; a < adjacentes.length; a++) {
-                    for (var s = 1; s < arestasByGrau.length; s++) {
-                        if (adjacentes[a][1] === arestasByGrau[s].vertice) {
+                    for (var s = 0; s < arestasByGrau.length; s++) {
+                        var vertice = arestasByGrau[s].vertice;
+                        //console.log(adjacentes[a][0], adjacentes[a][1]);
+                        if (adjacentes[a][0] === vertice || adjacentes[a][1] === vertice) {
+                            console.log(vertice, arestasByGrau[s].cor);
                             if (arestasByGrau[s].cor === cor) {
+                                console.log('isMesmaCor', cor, JSON.stringify(adjacentes));
                                 return true;
                             }
                         }
                     }
                 }
+                console.log('notMesmaCor', cor, JSON.stringify(adjacentes));
                 return false;
             }
 
-            while (semCor()) {
-                console.log(cont);
-                //     Definir a primeira cor não utilizada ainda como cor atual
-                if (arestasByGrau[0].cor === '#000000') {
-                    arestasByGrau[0].cor = cores[0];
-                }
-                var setCor = false;
-                //     Para cada vértice do grafo sem cor (seguindo a lista ordenada){
-                if (!setCor) {
-                    for (var s = 1; s < arestasByGrau.length; s++) {
-                        if (arestasByGrau[s].cor === '#000000') {
-                            console.log(s);
-                            var mesmaCor = false;
-                            for (var c = 0; c < cores.length; c++) {
-                                if (mesmaCor === false) {
-                                    var adjacentes = fn.rtArestas(arestasByGrau[s].vertice);
-                                    if (isMesmaCor(adjacentes, cores[c])) {
-                                        mesmaCor = true;
-                                    }
-                                    //         Atribuir a cor atual caso ele não tenha um vértice adjacente com a mesma cor
-                                    if (!mesmaCor) {
-                                        arestasByGrau[s].cor = cores[c];
-                                        setCor = true;
-                                    }
-                                }
-                            }
+            var cont = 0;
+            // Enquanto o existir um vértice sem cor no grafo {
+            while (semCor() && cont < cores.length) {
+                console.log(cores[cont]);
+                // Para cada vértice do grafo sem cor (seguindo a lista ordenada)
+                for (v = 0; v < arestasByGrau.length; v++) {
+                    if (null === arestasByGrau[v].cor) {
+                        // Atribuir a cor atual caso ele não tenha um vértice adjacente com a mesma cor
+                        if (!isMesmaCor(arestasByGrau[v].adjacentes, cores[cont])) {
+                            delete arestasByGrau[v]['adjacentes'];
+                            arestasByGrau[v].cor = cores[cont];
                         }
                     }
                 }
-
+                cont++;
             }
-            console.log(arestasByGrau);
-            fn.graphJS(arestasByGrau);
+            console.log(JSON.stringify(arestasByGrau));
+            data.cores = arestasByGrau;
         };
 
         /* ###################################################
