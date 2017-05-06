@@ -46,32 +46,36 @@
         };
 
         fn.actions = function (name, ev) {
-            if (name == 'criarGrafo') { // 0
+            if (name === 'criarGrafo') { // 0
                 fn.criarGrafo();
-            } else if (name == 'addVertice') { // 1
+            } else if (name === 'addVertice') { // 1
                 fn.addVertice();
-            } else if (name == 'rmVertice') { // 2
+            } else if (name === 'rmVertice') { // 2
                 fn.rmVertice();
-            } else if (name == 'addAresta') { // 3
+            } else if (name === 'addAresta') { // 3
                 fn.addAresta();
-            } else if (name == 'rmAresta') { // 4
+            } else if (name === 'rmAresta') { // 4
                 fn.rmAresta();
-            } else if (name == 'vrVertice') { // 5
+            } else if (name === 'vrVertice') { // 5
                 fn.vrVertice(null, true);
-            } else if (name == 'vrAresta') { // 6
+            } else if (name === 'vrAresta') { // 6
                 fn.vrAresta(null, null, true);
-            } else if (name == 'rtArestas') { // 7
+            } else if (name === 'rtArestas') { // 7
                 fn.rtArestas(null, true);
-            } else if (name == 'printGrafo') { // 8
+            } else if (name === 'printGrafo') { // 8
                 fn.printGrafo();
-            } else if (name == 'abrirXML') { // 9
+            } else if (name === 'abrirXML') { // 9
                 fn.abrirXML();
-            } else if (name == 'vrPlanaridade') { // 9
+            } else if (name === 'vrPlanaridade') { // 9
                 fn.vrPlanaridade(true);
-            } else if (name == 'bfs_dfs') { // -
+            } else if (name === 'bfs_dfs') { // -
                 fn.bfs_dfs();
-            } else if (name == 'dijkstra') { // -
+            } else if (name === 'dijkstra') { // -
                 fn.dijkstra();
+            } else if (name === 'welsh_powell') {
+                fn.coloracaoWP();
+            } else if (name === 'dsatur') {
+                fn.coloracaoDSATUR();
             }
         };
 
@@ -726,7 +730,7 @@
                     x: Math.random(),
                     y: Math.random(),
                     size: 3,
-                    color: 'green'
+                    color: '#00ff16'
                 });
             }
 
@@ -736,7 +740,7 @@
                     source: arestas[a][0],
                     target: arestas[a][1],
                     size: arestas[a][2] ? arestas[a][2] : 1,
-                    color: 'green'
+                    color: '#00ff16'
                 });
             }
 
@@ -838,6 +842,11 @@
             }
             console.log(JSON.stringify(arestasByGrau));
             data.cores = arestasByGrau;
+            for (var ag = 1; ag < data.cores.length; ag++) {
+                var node = data.graphJS.graph.nodes(data.cores[ag].vertice);
+                node.color = data.cores[ag].cor;
+            }
+            data.graphJS.refresh();
         };
 
         fn.coloracaoDSATUR = function () {
@@ -906,12 +915,12 @@
                 var a;
                 var arrAdjacentes = [];
                 for (a = 0; a < adjacentes.length; a++) {
-                        if (atual !== adjacentes[a][0] && arrAdjacentes.indexOf(adjacentes[a][0]) === -1) {
-                            arrAdjacentes.push(adjacentes[a][0]);
-                        }
-                        if (atual !== adjacentes[a][1] && arrAdjacentes.indexOf(adjacentes[a][1]) === -1) {
-                            arrAdjacentes.push(adjacentes[a][1]);
-                        }
+                    if (atual !== adjacentes[a][0] && arrAdjacentes.indexOf(adjacentes[a][0]) === -1) {
+                        arrAdjacentes.push(adjacentes[a][0]);
+                    }
+                    if (atual !== adjacentes[a][1] && arrAdjacentes.indexOf(adjacentes[a][1]) === -1) {
+                        arrAdjacentes.push(adjacentes[a][1]);
+                    }
                 }
                 console.log(atual, JSON.stringify(arrAdjacentes));
                 for (a = 0; a < arrAdjacentes.length; a++) {
@@ -964,6 +973,11 @@
             }
             console.log(JSON.stringify(arestasByGrau));
             data.cores = arestasByGrau;
+            for (var ag = 1; ag < data.cores.length; ag++) {
+                var node = data.graphJS.graph.nodes(data.cores[ag].vertice);
+                node.color = data.cores[ag].cor;
+            }
+            data.graphJS.refresh();
         };
 
         /* ###################################################
@@ -1017,8 +1031,6 @@
                 fn.addAresta('B', 'C');
                 fn.addAresta('C', 'E');
                 fn.addAresta('E', 'D');
-                //fn.coloracaoWP();
-                fn.coloracaoDSATUR();
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
