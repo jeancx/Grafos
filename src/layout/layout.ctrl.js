@@ -746,7 +746,7 @@
             data.graphJS = new sigma({
                 graph: g,
                 container: 'graph-container',
-                settings: { labelColor: 'node', labelThreshold: 0, labelSizeRatio: 4, labelSize: 'proportional' }
+                settings: {labelColor: 'node', labelThreshold: 0, labelSizeRatio: 4, labelSize: 'proportional'}
             });
 
             if (data.cores) {
@@ -840,6 +840,132 @@
             data.cores = arestasByGrau;
         };
 
+        fn.coloracaoDSATUR = function () {
+
+            var vertices = data.grafo.vertices;
+            var arestas = data.grafo.arestas;
+            var a, v, s;
+
+            //Criar um vetor de cores
+            var cores = ['green', 'blue', 'yellow', 'red', 'purple'];
+            console.log(cores);
+
+            //Ordenar os vértices pelo seu grau em ordem decrescente
+            var arestasByGrau = [];
+            for (v = 0; v < vertices.length; v++) {
+                arestasByGrau.push(
+                    {
+                        vertice: vertices[v],
+                        grau: fn.rtArestas(vertices[v]).length,
+                        //Inicializar todos os vértices como “sem cor”
+                        cor: null,
+                        adjacentes: fn.rtArestas(vertices[v]),
+                        saturacao: 0
+                    }
+                );
+            }
+
+            arestasByGrau.sort(function (a, b) {
+                if (a.grau < b.grau) {
+                    return 1;
+                }
+                if (a.grau > b.grau) {
+                    return -1;
+                }
+                return 0;
+            });
+
+            function semCor() {
+                for (var a = 0; a < arestasByGrau.length; a++) {
+                    if (null === arestasByGrau[a].cor) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function isMesmaCorAdjacente(adjacentes, cor) {
+                for (var a = 0; a < adjacentes.length; a++) {
+                    for (var s = 0; s < arestasByGrau.length; s++) {
+                        var vertice = arestasByGrau[s].vertice;
+                        //console.log(adjacentes[a][0], adjacentes[a][1]);
+                        if (adjacentes[a][0] === vertice || adjacentes[a][1] === vertice) {
+                            console.log(vertice, arestasByGrau[s].cor);
+                            if (arestasByGrau[s].cor === cor) {
+                                console.log('isMesmaCorAdjacente', cor, JSON.stringify(adjacentes));
+                                return true;
+                            }
+                        }
+                    }
+                }
+                console.log('notMesmaCor', cor, JSON.stringify(adjacentes));
+                return false;
+            }
+
+            function saturacaoAdjacentes(adjacentes, atual) {
+                var a;
+                var arrAdjacentes = [];
+                for (a = 0; a < adjacentes.length; a++) {
+                        if (atual !== adjacentes[a][0] && arrAdjacentes.indexOf(adjacentes[a][0]) === -1) {
+                            arrAdjacentes.push(adjacentes[a][0]);
+                        }
+                        if (atual !== adjacentes[a][1] && arrAdjacentes.indexOf(adjacentes[a][1]) === -1) {
+                            arrAdjacentes.push(adjacentes[a][1]);
+                        }
+                }
+                console.log(atual, JSON.stringify(arrAdjacentes));
+                for (a = 0; a < arrAdjacentes.length; a++) {
+                    for (var s = 0; s < arestasByGrau.length; s++) {
+                        var vertice = arestasByGrau[s].vertice;
+                        if (arrAdjacentes[a] === vertice) {
+                            arestasByGrau[s].saturacao++;
+                        }
+                    }
+                }
+            }
+
+            function maiorSaturacaoAndGrau() {
+                var maior = {saturacao: 0};
+                for (var a = 1; a < arestasByGrau.length; a++) {
+                    if (arestasByGrau[a].cor === null) {
+                        if (arestasByGrau[a].saturacao > maior.saturacao) {
+                            maior = arestasByGrau[a];
+                        }
+                    }
+                }
+                for (var m = 0; m < arestasByGrau.length; m++) {
+                    if (maior.vertice === arestasByGrau[m].vertice) {
+                        return m;
+                    }
+                }
+            }
+
+            //Colorir o vértice com maior grau com a primeira cor
+            saturacaoAdjacentes(arestasByGrau[0].adjacentes, arestasByGrau[0].vertice);
+            delete arestasByGrau[0]['adjacentes'];
+            arestasByGrau[0].cor = cores[0];
+            //console.log(arestasByGrau[0]);
+
+            // Enquanto o existir um vértice sem cor no grafo {
+            while (semCor()) {
+                // Selecionar o vértice com maior grau de saturação, em caso de empate, escolher o com maior grau dentre os de maior saturação
+                var maior = maiorSaturacaoAndGrau();
+                console.log(maior);
+                if (maior) {
+                    for (var c = 0; c < cores.length; c++) {
+                        // Atribuir a cor atual caso ele não tenha um vértice adjacente com a mesma cor
+                        if (arestasByGrau[maior].cor === null && !isMesmaCorAdjacente(arestasByGrau[maior].adjacentes, cores[c])) {
+                            saturacaoAdjacentes(arestasByGrau[maior].adjacentes, arestasByGrau[maior].vertice);
+                            delete arestasByGrau[maior]['adjacentes'];
+                            arestasByGrau[maior].cor = cores[c];
+                        }
+                    }
+                }
+            }
+            console.log(JSON.stringify(arestasByGrau));
+            data.cores = arestasByGrau;
+        };
+
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
          * ####################################################
@@ -885,14 +1011,14 @@
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addAresta('A', 'B', 3);
-                fn.addAresta('A', 'C', 5);
-                fn.addAresta('A', 'D', 6);
-                fn.addAresta('B', 'D', 2);
-                fn.addAresta('B', 'E', 9);
-                fn.addAresta('C', 'E', 2);
-                fn.addAresta('A', 'E', 8);
-                fn.coloracaoWP();
+                fn.addAresta('A', 'B');
+                fn.addAresta('A', 'D');
+                fn.addAresta('B', 'E');
+                fn.addAresta('B', 'C');
+                fn.addAresta('C', 'E');
+                fn.addAresta('E', 'D');
+                //fn.coloracaoWP();
+                fn.coloracaoDSATUR();
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
