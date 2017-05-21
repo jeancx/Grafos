@@ -725,15 +725,17 @@
             // Generate a random graph:
             for (var v = 0; v < vertices.length; v++) {
                 g.nodes.push({
-                    id: vertices[v],
-                    label: vertices[v],
-                    x: Math.random(),
-                    y: Math.random(),
-                    size: 3,
-                    color: '#00ff16'
+                id: vertices[v],
+                label: vertices[v],
+                x: Math.random(),
+                y: Math.random(),
+                size: 3,
+                color: "#00ff16"
                 });
             }
 
+
+            //
             for (var a = 0; a < arestas.length; a++) {
                 g.edges.push({
                     id: arestas[a][0] + '_' + arestas[a][1],
@@ -752,6 +754,7 @@
                 container: 'graph-container',
                 settings: {labelColor: 'node', labelThreshold: 0, labelSizeRatio: 4, labelSize: 'proportional'}
             });
+            
 
             if (data.cores) {
                 for (var ag = 1; ag < data.cores.length; ag++) {
@@ -760,6 +763,11 @@
                 }
                 data.graphJS.refresh();
             }
+            data.graphJS.graph.nodes().forEach(function(node, i, a) {
+                node.x = Math.cos(Math.PI * 2 * i / a.length);
+                node.y = Math.sin(Math.PI * 2 * i / a.length);
+            });
+            data.graphJS.refresh();
         };
 
 
@@ -1030,7 +1038,7 @@
                 fn.addAresta('B', 'E');
                 fn.addAresta('B', 'C');
                 fn.addAresta('C', 'E');
-                fn.addAresta('E', 'D');
+                fn.addAresta('E', 'D');//*/
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
