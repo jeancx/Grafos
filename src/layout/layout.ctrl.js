@@ -997,12 +997,12 @@
 
             // Inicia um conjunto S vazio de arestas para a solução
             // Inicia um conjunto Q com todos os vértices do grafo para o controle
-            var S = [], Q = angular.copy(data.vertices), v, a, total = 0;
+            var S = [], Q = angular.copy(data.grafo.vertices), v, a, total = 0;
 
 
             // Escolhe um vértice arbitrário A do grafo como vértice inicial
-            var random = (Math.floor(Math.random() * data.vertices.length) + 1) - 1;
-            var vInicial = angular.copy(data.vertices[random]);
+            var random = (Math.floor(Math.random() * data.grafo.vertices.length) + 1) - 1;
+            var vInicial = angular.copy(data.grafo.vertices[random]);
 
             // Remove A do conjunto Q
             function _removeVertice(v) {
@@ -1020,15 +1020,15 @@
                 var U, V, menor = infinite;
 
                 //     Encontra a menor aresta {U, V}, onde U pertencente ao conjunto Q e V não pertence ao conjunto Q
-                for (a = 0; a < data.arestas.length; a++) {
-                    var aresta = data.arestas[a];
-                    if (aresta[0] === vInicial && q.indexOf(aresta[1]) !== -1) {
+                for (a = 0; a < data.grafo.arestas.length; a++) {
+                    var aresta = data.grafo.arestas[a];
+                    if (aresta[0] === vInicial && Q.indexOf(aresta[1]) !== -1) {
                         if (aresta[2] < menor) {
                             menor = aresta[2];
                             V = vInicial;
                             U = aresta[1];
                         }
-                    } else if (aresta[1] === vInicial && q.indexOf(aresta[0])) {
+                    } else if (aresta[1] === vInicial && Q.indexOf(aresta[0])) {
                         if (aresta[2] < menor) {
                             menor = aresta[2];
                             V = vInicial;
