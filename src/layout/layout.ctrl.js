@@ -76,6 +76,10 @@
                 fn.coloracaoWP();
             } else if (name === 'dsatur') {
                 fn.coloracaoDSATUR();
+            } else if (name === 'prim') {
+                fn.prim();
+            } else if (name === 'kruskal') {
+                fn.kruskal();
             }
         };
 
@@ -725,12 +729,12 @@
             // Generate a random graph:
             for (var v = 0; v < vertices.length; v++) {
                 g.nodes.push({
-                id: vertices[v],
-                label: vertices[v],
-                x: Math.random(),
-                y: Math.random(),
-                size: 3,
-                color: "#00ff16"
+                    id: vertices[v],
+                    label: vertices[v],
+                    x: Math.random(),
+                    y: Math.random(),
+                    size: 3,
+                    color: "#00ff16"
                 });
             }
 
@@ -754,7 +758,7 @@
                 container: 'graph-container',
                 settings: {labelColor: 'node', labelThreshold: 0, labelSizeRatio: 4, labelSize: 'proportional'}
             });
-            
+
 
             if (data.cores) {
                 for (var ag = 1; ag < data.cores.length; ag++) {
@@ -763,7 +767,7 @@
                 }
                 data.graphJS.refresh();
             }
-            data.graphJS.graph.nodes().forEach(function(node, i, a) {
+            data.graphJS.graph.nodes().forEach(function (node, i, a) {
                 node.x = Math.cos(Math.PI * 2 * i / a.length);
                 node.y = Math.sin(Math.PI * 2 * i / a.length);
             });
@@ -988,6 +992,101 @@
             data.graphJS.refresh();
         };
 
+
+        fn.prim = function () {
+
+            // Inicia um conjunto S vazio de arestas para a solução
+            // Inicia um conjunto Q com todos os vértices do grafo para o controle
+            var S = [], Q = angular.copy(data.vertices), v, a, total = 0;
+
+
+            // Escolhe um vértice arbitrário A do grafo como vértice inicial
+            var random = (Math.floor(Math.random() * data.vertices.length) + 1) - 1;
+            var vInicial = angular.copy(data.vertices[random]);
+
+            // Remove A do conjunto Q
+            function _removeVertice(v) {
+                angular.forEach(Q, function (value, key) {
+                    if (value === v) {
+                        Q.splice(key, 1);
+                    }
+                });
+            }
+
+            _removeVertice(vInicial);
+
+            while (Q.length > 0) { // Enquanto Q não estiver vazio{
+
+                var U, V, menor = infinite;
+
+                //     Encontra a menor aresta {U, V}, onde U pertencente ao conjunto Q e V não pertence ao conjunto Q
+                for (a = 0; a < data.arestas.length; a++) {
+                    var aresta = data.arestas[a];
+                    if (aresta[0] === vInicial && q.indexOf(aresta[1]) !== -1) {
+                        if (aresta[2] < menor) {
+                            menor = aresta[2];
+                            V = vInicial;
+                            U = aresta[1];
+                        }
+                    } else if (aresta[1] === vInicial && q.indexOf(aresta[0])) {
+                        if (aresta[2] < menor) {
+                            menor = aresta[2];
+                            V = vInicial;
+                            U = aresta[0];
+                        }
+                    }
+                }
+
+                //     Adiciona a aresta {U, V} para o conjunto solução S
+                S.push([U, V, menor]);
+                total += menor;
+
+                //     Remove o vértice U do conjunto de controle Q
+                _removeVertice(U);
+
+
+            }// }
+
+
+        };
+
+
+        fn.kruskal = function () {
+
+        };
+
+        fn.TSP = function () {
+
+            // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
+            var grafo = fn.startGrafo();
+            var stop = false;
+            var caminhos = [];
+            var vertices = data.grafo.vertices;
+
+            var _recursiveRun = function (start, visitados, caminho, p) {
+                if (p < grafo[start].vizinhos.length) {
+                    if (visitados.indexOf(grafo[start].vizinhos[p]) === -1) {
+                        visitados.push(grafo[start].vizinhos[p].nome);
+                        caminho.push({nome: grafo[start].vizinhos[p].nome, peso: grafo[start].vizinhos[p].peso});
+                        $timeout(function () {
+                            var x = _recursiveRun(grafo[start].vizinhos[p].nome, visitados, caminho, p + 1);
+                            if (x) {
+                                caminho.push(x);
+                            }
+                        });
+                    }
+                }
+                if (caminho && caminhos.indexOf(caminho) === -1) {
+                    caminhos.push(caminho);
+                }
+            };
+
+            _recursiveRun(vertices[0], [], [], 0);
+
+            console.log(caminhos);
+
+        };
+
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
          * ####################################################
@@ -1033,12 +1132,30 @@
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addAresta('A', 'B');
-                fn.addAresta('A', 'D');
-                fn.addAresta('B', 'E');
-                fn.addAresta('B', 'C');
-                fn.addAresta('C', 'E');
-                fn.addAresta('E', 'D');//*/
+                fn.addVertice();
+                fn.addVertice();
+                fn.addAresta('A', 'B', 5);
+                fn.addAresta('A', 'C', 15);
+                fn.addAresta('A', 'D', 4);
+                fn.addAresta('A', 'E', 5);
+                fn.addAresta('A', 'F', 12);
+                fn.addAresta('A', 'G', 10);
+                fn.addAresta('B', 'C', 8);
+                fn.addAresta('B', 'D', 15);
+                fn.addAresta('B', 'E', 3);
+                fn.addAresta('B', 'F', 9);
+                fn.addAresta('B', 'G', 12);
+                fn.addAresta('C', 'D', 8);
+                fn.addAresta('C', 'E', 8);
+                fn.addAresta('C', 'F', 5);
+                fn.addAresta('C', 'G', 5);
+                fn.addAresta('D', 'E', 8);
+                fn.addAresta('D', 'F', 6);
+                fn.addAresta('D', 'G', 11);
+                fn.addAresta('E', 'F', 20);
+                fn.addAresta('E', 'G', 7);
+                fn.addAresta('F', 'G', 11);
+                fn.TSP();
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
