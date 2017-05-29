@@ -1004,7 +1004,6 @@
             var random = (Math.floor(Math.random() * data.grafo.vertices.length) + 1) - 1;
             var vInicial = angular.copy(data.grafo.vertices[random]);
 
-            // Remove A do conjunto Q
             function _removeVertice(v) {
                 angular.forEach(Q, function (value, key) {
                     if (value === v) {
@@ -1013,26 +1012,28 @@
                 });
             }
 
+            // Remove A do conjunto Q
             _removeVertice(vInicial);
 
-            while (Q.length > 0) { // Enquanto Q não estiver vazio{
-
+            var cont = 0;
+            while (Q.length > 0 && cont < 10) { // Enquanto Q não estiver vazio{
+                cont++;
                 var U, V, menor = infinite;
 
                 //     Encontra a menor aresta {U, V}, onde U pertencente ao conjunto Q e V não pertence ao conjunto Q
                 for (a = 0; a < data.grafo.arestas.length; a++) {
                     var aresta = data.grafo.arestas[a];
-                    if (aresta[0] === vInicial && Q.indexOf(aresta[1]) !== -1) {
+                    if (Q.indexOf(aresta[0]) !== -1 && Q.indexOf(aresta[1]) === -1) {
                         if (aresta[2] < menor) {
-                            menor = aresta[2];
-                            V = vInicial;
-                            U = aresta[1];
-                        }
-                    } else if (aresta[1] === vInicial && Q.indexOf(aresta[0])) {
-                        if (aresta[2] < menor) {
-                            menor = aresta[2];
-                            V = vInicial;
                             U = aresta[0];
+                            V = aresta[1];
+                            menor = aresta[2];
+                        }
+                    } else if (S.indexOf(aresta[1]) !== -1 && Q.indexOf(aresta[0]) === -1) {
+                        if (aresta[2] < menor) {
+                            U = aresta[1];
+                            V = aresta[0];
+                            menor = aresta[2];
                         }
                     }
                 }
@@ -1047,12 +1048,98 @@
 
             }// }
 
+            console.log(Q, S);
+
 
         };
 
 
         fn.kruskal = function () {
 
+            // Inicia um conjunto S vazio de arestas para a solução
+            // Inicia um conjunto Q com todas as arestas do grafo para o controle
+            var S = [], Q = angular.copy(data.grafo.arestas), F = [], v, a, total = 0;
+
+            // Inicia uma floresta (um conjunto de árvores) F com cada vértice isolado sendo uma árvore
+            for (v = 0; v < data.grafo.vertices.length; v++) {
+                F.push([data.grafo.vertices[v]]);
+            }
+
+
+            // Remove a aresta {U, V} do conjunto Q
+            function _removeAresta(U, V) {
+                angular.forEach(Q, function (value, key) {
+                    if (value[0] === U && value[1] === V) {
+                        Q.splice(key, 1);
+                    } else if (value[1] === U && value[0] === V) {
+                        Q.splice(key, 1);
+                    }
+                });
+            }
+
+            // Verifica se U e V estão em conjuntos diferentes de arvore
+            function _isDiferenteConjuntoArvore(U, V) {
+                var indiceU, IndiceV;
+                for (var i = 0; i < F.length; i++) {
+                    if (F[i].indexOf(U) >= 0) {
+                        indiceU = F[i].indexOf(U);
+                    }
+                    if (F[i].indexOf(V) >= 0) {
+                        IndiceV = F[i].indexOf(V);
+                    }
+                }
+                return indiceU === IndiceV;
+            }
+
+            var cont = 0;
+            while (Q.length > 0 && cont < 10) { // Enquanto Q não estiver vazio{
+                cont++;
+
+                var U, V, menor = infinite;
+
+                //     Seleciona a menor aresta {U, V} do conjunto Q
+                for (a = 0; a < Q.length; a++) {
+                    var aresta = Q[a];
+                    if (aresta[2] < menor) {
+                        U = aresta[0];
+                        V = aresta[1];
+                        menor = aresta[2];
+                    }
+                }
+
+                //     Remove a aresta {U, V} do conjunto Q
+                _removeAresta(U, V);
+
+                console.log(U, V, _isDiferenteConjuntoArvore(U, V));
+
+                if (_isDiferenteConjuntoArvore(U, V)) { //     Se U e V pertencem a árvores diferentes no conjunto F{
+                    // Adiciona a aresta {U, V} para o conjunto S
+                    S.push([U, V, menor]);
+                    total += menor;
+                    // Une as árvores que contém U e que contém V no conjunto F
+                    var iFU, iFV;
+                    for (var i = 0; i < F.length; i++) {
+                        if (F[i].indexOf(U) >= 0) {
+                            iFU = F[i].indexOf(U);
+                        }
+                        if (F[i].indexOf(V) >= 0) {
+                            iFV = F[i].indexOf(V);
+                        }
+                    }
+                    if(F[iFV] && F[iFU]){
+                        for(var x = 0; x < F[iFV].length; x++){
+                            console.log(F[iFU][x]);
+                            F[iFU].push(F[iFV][x] + '');
+                        }
+                        console.log(F[iFU]);
+                        F.splice(iFV, 1);
+                    }
+
+                } //     }
+
+            }// }
+
+            console.log('Solucao: ' + JSON.stringify(S), 'Floresta: ' + JSON.stringify(F));
         };
 
         fn.TSP = function () {
@@ -1127,34 +1214,60 @@
             data.historico = [];
 
             $timeout(function () {
+
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addVertice();
-                fn.addAresta('A', 'B', 5);
-                fn.addAresta('A', 'C', 15);
-                fn.addAresta('A', 'D', 4);
-                fn.addAresta('A', 'E', 5);
-                fn.addAresta('A', 'F', 12);
-                fn.addAresta('A', 'G', 10);
-                fn.addAresta('B', 'C', 8);
-                fn.addAresta('B', 'D', 15);
-                fn.addAresta('B', 'E', 3);
-                fn.addAresta('B', 'F', 9);
-                fn.addAresta('B', 'G', 12);
-                fn.addAresta('C', 'D', 8);
-                fn.addAresta('C', 'E', 8);
-                fn.addAresta('C', 'F', 5);
-                fn.addAresta('C', 'G', 5);
-                fn.addAresta('D', 'E', 8);
-                fn.addAresta('D', 'F', 6);
-                fn.addAresta('D', 'G', 11);
-                fn.addAresta('E', 'F', 20);
-                fn.addAresta('E', 'G', 7);
-                fn.addAresta('F', 'G', 11);
+
+                fn.addAresta('A', 'C', 7);
+                fn.addAresta('A', 'D', 2);
+                fn.addAresta('A', 'E', 10);
+
+                fn.addAresta('B', 'C', 3);
+                fn.addAresta('B', 'F', 2);
+
+                fn.addAresta('C', 'E', 9);
+                fn.addAresta('C', 'F', 3);
+
+                fn.addAresta('D', 'E', 7);
+                fn.addAresta('D', 'F', 4);
+
+                fn.addAresta('E', 'F', 8);
+
+
+                //TESTE CAIXEIRO VIAJANTE
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addAresta('A', 'B', 5);
+                // fn.addAresta('A', 'C', 15);
+                // fn.addAresta('A', 'D', 4);
+                // fn.addAresta('A', 'E', 5);
+                // fn.addAresta('A', 'F', 12);
+                // fn.addAresta('A', 'G', 10);
+                // fn.addAresta('B', 'C', 8);
+                // fn.addAresta('B', 'D', 15);
+                // fn.addAresta('B', 'E', 3);
+                // fn.addAresta('B', 'F', 9);
+                // fn.addAresta('B', 'G', 12);
+                // fn.addAresta('C', 'D', 8);
+                // fn.addAresta('C', 'E', 8);
+                // fn.addAresta('C', 'F', 5);
+                // fn.addAresta('C', 'G', 5);
+                // fn.addAresta('D', 'E', 8);
+                // fn.addAresta('D', 'F', 6);
+                // fn.addAresta('D', 'G', 11);
+                // fn.addAresta('E', 'F', 20);
+                // fn.addAresta('E', 'G', 7);
+                // fn.addAresta('F', 'G', 11);
+
                 fn.TSP();
             }, 1000);
             $timeout(function () {
