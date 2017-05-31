@@ -1036,11 +1036,11 @@
                             menor = aresta[2];
                         }
                     }
-                    console.log(U,V,menor);
+                    console.log(U, V, menor);
                 }
 
 
-                if(menor !== infinite){
+                if (menor !== infinite) {
                     //     Adiciona a aresta {U, V} para o conjunto solução S
                     S.push([U, V, menor]);
                     total += menor;
@@ -1049,13 +1049,10 @@
                 }
 
 
-
-
-
             }// }
 
             fn.alert(
-                'Solucao: ' + JSON.stringify(S) +
+                'Solucao: ' + JSON.stringify(S) + '\n\rTotal: ' + total +
                 '\n\r\n\r\n\r Controle: ' + JSON.stringify(Q)
             );
 
@@ -1145,7 +1142,7 @@
             }// }
 
             fn.alert(
-                'Solucao: ' + JSON.stringify(S) +
+                'Solucao: ' + JSON.stringify(S) + '\n\rTotal: ' + total +
                 '\n\r\n\r\n\r Floresta: ' + JSON.stringify(F) +
                 '\n\r\n\r\n\r Controle: ' + JSON.stringify(Q)
             );
