@@ -1029,7 +1029,7 @@
                             V = aresta[1];
                             menor = aresta[2];
                         }
-                    } else if (S.indexOf(aresta[1]) !== -1 && Q.indexOf(aresta[0]) === -1) {
+                    } else if (Q.indexOf(aresta[1]) !== -1 && Q.indexOf(aresta[0]) === -1) {
                         if (aresta[2] < menor) {
                             U = aresta[1];
                             V = aresta[0];
@@ -1039,12 +1039,17 @@
                     console.log(U,V,menor);
                 }
 
-                //     Adiciona a aresta {U, V} para o conjunto solução S
-                S.push([U, V, menor]);
-                total += menor;
 
-                //     Remove o vértice U do conjunto de controle Q
-                _removeVertice(U);
+                if(menor !== infinite){
+                    //     Adiciona a aresta {U, V} para o conjunto solução S
+                    S.push([U, V, menor]);
+                    total += menor;
+                    //     Remove o vértice U do conjunto de controle Q
+                    _removeVertice(U);
+                }
+
+
+
 
 
             }// }
