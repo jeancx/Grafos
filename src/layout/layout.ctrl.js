@@ -1016,7 +1016,7 @@
             _removeVertice(vInicial);
 
             var cont = 0;
-            while (Q.length > 0 && cont < 10) { // Enquanto Q não estiver vazio{
+            while (Q.length > 0 && cont < 20) { // Enquanto Q não estiver vazio{
                 cont++;
                 var U, V, menor = infinite;
 
@@ -1036,6 +1036,7 @@
                             menor = aresta[2];
                         }
                     }
+                    console.log(U,V,menor);
                 }
 
                 //     Adiciona a aresta {U, V} para o conjunto solução S
@@ -1048,7 +1049,10 @@
 
             }// }
 
-            console.log(Q, S);
+            fn.alert(
+                'Solucao: ' + JSON.stringify(S) +
+                '\n\r\n\r\n\r Controle: ' + JSON.stringify(Q)
+            );
 
 
         };
@@ -1117,29 +1121,33 @@
                     S.push([U, V, menor]);
                     total += menor;
                     // Une as árvores que contém U e que contém V no conjunto F
-                    var iFU, iFV;
+                    var iFU = [-1, -1], iFV = [-1, -1];
+                    console.log(F);
                     for (var i = 0; i < F.length; i++) {
                         if (F[i].indexOf(U) >= 0) {
-                            iFU = F[i].indexOf(U);
+                            iFU[0] = i;
+                            iFU[1] = F[i].indexOf(U);
                         }
                         if (F[i].indexOf(V) >= 0) {
-                            iFV = F[i].indexOf(V);
+                            iFV[0] = i;
+                            iFV[1] = F[i].indexOf(V);
                         }
+                        console.log(iFU, iFU);
                     }
-                    if(F[iFV] && F[iFU]){
-                        for(var x = 0; x < F[iFV].length; x++){
-                            console.log(F[iFU][x]);
-                            F[iFU].push(F[iFV][x] + '');
-                        }
-                        console.log(F[iFU]);
-                        F.splice(iFV, 1);
+                    if (iFU[0] >= 0 && iFU[0] >= 0) {
+                        F[iFU[0]][iFU[1]] = [].concat(F[iFU[0]][iFU[1]], F[iFV[0]][iFV[1]]);
+                        F.splice(iFV[0], 1);
                     }
-
                 } //     }
 
             }// }
 
-            console.log('Solucao: ' + JSON.stringify(S), 'Floresta: ' + JSON.stringify(F));
+            fn.alert(
+                'Solucao: ' + JSON.stringify(S) +
+                '\n\r\n\r\n\r Floresta: ' + JSON.stringify(F) +
+                '\n\r\n\r\n\r Controle: ' + JSON.stringify(Q)
+            );
+
         };
 
         fn.TSP = function () {
@@ -1170,7 +1178,7 @@
 
             _recursiveRun(vertices[0], [], [], 0);
 
-            console.log(caminhos);
+            fn.alert(JSON.stringify(caminhos));
 
         };
 
@@ -1268,7 +1276,7 @@
                 // fn.addAresta('E', 'G', 7);
                 // fn.addAresta('F', 'G', 11);
 
-                fn.TSP();
+                //fn.TSP();
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
