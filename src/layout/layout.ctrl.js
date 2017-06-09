@@ -1247,6 +1247,7 @@
             //console.log(caminhos);
             for (var indiceB = 0;indiceB < caminhos.length ;indiceB++) {
                 if ( caminhos[indiceB][1] < menor ){
+                    menor = caminhos[indiceB][1];
                     indiceMenor = indiceB;
                 }
             }
