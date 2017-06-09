@@ -1148,38 +1148,112 @@
             );
 
         };
+            fn.exist = function (nome,lista) {
+                for (var i = 0; i < lista.length;i++){
+                 if (lista[i] == nome) {
+                     return true;
+                 }
+             
+                }
+                return false;
+             
+            }
 
-        fn.TSP = function () {
+        fn.TSPV = function (inicio) {
 
             // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
             var grafo = fn.startGrafo();
             var stop = false;
-            var caminhos = [];
+            var caminho = [];
+            var menor = [];
             var vertices = data.grafo.vertices;
+            var posInicial = inicio;
+            var distancia = 0;
+            //console.log(vertices);
+            //console.log("grafo",grafo);
+            
 
-            var _recursiveRun = function (start, visitados, caminho, p) {
-                if (p < grafo[start].vizinhos.length) {
-                    if (visitados.indexOf(grafo[start].vizinhos[p]) === -1) {
-                        visitados.push(grafo[start].vizinhos[p].nome);
-                        caminho.push({nome: grafo[start].vizinhos[p].nome, peso: grafo[start].vizinhos[p].peso});
-                        $timeout(function () {
-                            var x = _recursiveRun(grafo[start].vizinhos[p].nome, visitados, caminho, p + 1);
-                            if (x) {
-                                caminho.push(x);
-                            }
-                        });
+            //fn.retornaMenor = function (v) {
+            
+            //}
+
+            caminho.push(posInicial);
+            //console.log("c:", caminho);
+            var num = 0;
+            while (true) {
+                //console.log("run: ", num);
+                var menorDistancia = 99999;
+                var menorVertice;
+                for (var indiceA = 0;indiceA < grafo[posInicial].vizinhos.length;indiceA++){
+                    //console.log(indiceA,grafo[posInicial].vizinhos[indiceA]);
+                    if (  grafo[posInicial].vizinhos[indiceA].peso < menorDistancia &&  !fn.exist(grafo[posInicial].vizinhos[indiceA].nome,caminho)) {
+                        menorDistancia = grafo[posInicial].vizinhos[indiceA].peso;
+                        menorVertice = grafo[posInicial].vizinhos[indiceA].nome;
                     }
+                    
+                //console.log("menor: ",menorVertice);
                 }
-                if (caminho && caminhos.indexOf(caminho) === -1) {
-                    caminhos.push(caminho);
+                if(menorVertice === posInicial) {
+                    break;
                 }
-            };
+                caminho.push(menorVertice);
+                distancia += menorDistancia;
+                num += 1;
+                posInicial = menorVertice;
+            }
+            console.log("Caminho do vertice:",inicio," ", caminho, "Distancia: ",distancia );
+            return [caminho, distancia];
+            
+            // var _recursiveRun = function (start, visitados, caminho, p) {
+            //     if (p < grafo[start].vizinhos.length) {
+            //         if (visitados.indexOf(grafo[start].vizinhos[p]) === -1) {
+            //             visitados.push(grafo[start].vizinhos[p].nome);
+            //             caminho.push({nome: grafo[start].vizinhos[p].nome, peso: grafo[start].vizinhos[p].peso});
+            //             $timeout(function () {
+            //                 var x = _recursiveRun(grafo[start].vizinhos[p].nome, visitados, caminho, p + 1);
+            //                 if (x) {
+            //                     caminho.push(x);
+            //                 }
+            //             });
+            //         }
+            //     }
+            //     if (caminho && caminhos.indexOf(caminho) === -1) {
+            //         caminhos.push(caminho);
+            //     }
+            // };
 
-            _recursiveRun(vertices[0], [], [], 0);
+            // _recursiveRun(vertices[0], [], [], 0);
 
-            fn.alert(JSON.stringify(caminhos));
+
+            //fn.alert(JSON.stringify(caminhos+" "+distancia));
+
 
         };
+
+        fn.TSP = function () {
+            //var fo = fn.startGrafo();
+            var vertices = data.grafo.vertices;
+            //console.log(vertices);
+            var caminhos = [];
+            
+            for (var indice = 0;indice < vertices.length;indice++){
+                //console.log("JASEFHAKSGFH: ", vertices[indice]);
+                caminhos.push(fn.TSPV(vertices[indice]));
+            }
+
+            var menor = 9999;
+            var indiceMenor;
+            //console.log("FIM");
+            //console.log(caminhos);
+            for (var indiceB = 0;indiceB < caminhos.length ;indiceB++) {
+                if ( caminhos[indiceB][1] < menor ){
+                    indiceMenor = indiceB;
+                }
+            }
+            console.log("Menor Caminho do Grafo: ", caminhos[indiceMenor]);
+            fn.alert(JSON.stringify("Menor Caminho do Grafo: "+ caminhos[indiceMenor]));
+            //fn.alert(JSON.stringify(caminhos+" "+distancia));
+        }
 
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
@@ -1222,7 +1296,7 @@
 
             $timeout(function () {
 
-                fn.addVertice();
+/*                fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
@@ -1242,40 +1316,42 @@
                 fn.addAresta('D', 'E', 7);
                 fn.addAresta('D', 'F', 4);
 
-                fn.addAresta('E', 'F', 8);
+                fn.addAresta('E', 'F', 8);*/
 
 
                 //TESTE CAIXEIRO VIAJANTE
-                // fn.addVertice();
-                // fn.addVertice();
-                // fn.addVertice();
-                // fn.addVertice();
-                // fn.addVertice();
-                // fn.addVertice();
-                // fn.addVertice();
-                // fn.addAresta('A', 'B', 5);
-                // fn.addAresta('A', 'C', 15);
-                // fn.addAresta('A', 'D', 4);
-                // fn.addAresta('A', 'E', 5);
-                // fn.addAresta('A', 'F', 12);
-                // fn.addAresta('A', 'G', 10);
-                // fn.addAresta('B', 'C', 8);
-                // fn.addAresta('B', 'D', 15);
-                // fn.addAresta('B', 'E', 3);
-                // fn.addAresta('B', 'F', 9);
-                // fn.addAresta('B', 'G', 12);
-                // fn.addAresta('C', 'D', 8);
-                // fn.addAresta('C', 'E', 8);
-                // fn.addAresta('C', 'F', 5);
-                // fn.addAresta('C', 'G', 5);
-                // fn.addAresta('D', 'E', 8);
-                // fn.addAresta('D', 'F', 6);
-                // fn.addAresta('D', 'G', 11);
-                // fn.addAresta('E', 'F', 20);
-                // fn.addAresta('E', 'G', 7);
-                // fn.addAresta('F', 'G', 11);
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addAresta('A', 'B', 5);
+                fn.addAresta('A', 'C', 15);
+                fn.addAresta('A', 'D', 4);
+                fn.addAresta('A', 'E', 5);
+                fn.addAresta('A', 'F', 12);
+                fn.addAresta('A', 'G', 10);
+                fn.addAresta('B', 'C', 8);
+                fn.addAresta('B', 'D', 15);
+                fn.addAresta('B', 'E', 3);
+                fn.addAresta('B', 'F', 9);
+                fn.addAresta('B', 'G', 12);
+                fn.addAresta('C', 'D', 8);
+                fn.addAresta('C', 'E', 8);
+                fn.addAresta('C', 'F', 5);
+                fn.addAresta('C', 'G', 5);
+                fn.addAresta('D', 'E', 8);
+                fn.addAresta('D', 'F', 6);
+                fn.addAresta('D', 'G', 11);
+                fn.addAresta('E', 'F', 20);
+                fn.addAresta('E', 'G', 7);
+                fn.addAresta('F', 'G', 11);
 
-                //fn.TSP();
+                //fn.TSPV('A');
+                fn.TSP();
+
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
