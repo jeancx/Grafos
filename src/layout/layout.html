@@ -99,6 +99,14 @@
                                 <span class="md-alt-text"> 8</span>
                             </md-button>
                         </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+                <md-menu>
+                    <button ng-click="$mdMenu.open()">
+                        <md-icon>code</md-icon>
+                        Algorítimos
+                    </button>
+                    <md-menu-content>
                         <md-menu-item class="md-indent">
                             <md-icon>code</md-icon>
                             <md-button ng-click="fn.actions('vrPlanaridade', $event)">
@@ -139,6 +147,18 @@
                             <md-icon>code</md-icon>
                             <md-button ng-click="fn.actions('kruskal', $event)">
                                 Kruskal
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item class="md-indent">
+                            <md-icon>code</md-icon>
+                            <md-button ng-click="fn.actions('TSP', $event)">
+                                Caixeiro Viajante (TSP)
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item class="md-indent">
+                            <md-icon>code</md-icon>
+                            <md-button ng-click="fn.actions('fordFukerson', $event)">
+                                Ford-Fukerson
                             </md-button>
                         </md-menu-item>
                     </md-menu-content>
