@@ -80,10 +80,6 @@
                 fn.prim();
             } else if (name === 'kruskal') {
                 fn.kruskal();
-            } else if (name === 'TSP') {
-                fn.TSP();
-            } else if (name === 'fordFukerson') {
-                fn.fordFukerson();
             }
         };
 
@@ -754,12 +750,7 @@
                 });
             }
 
-            try {
-                data.graphJS.kill();
-            } catch (ex) {
-
-            }
-
+            data.graphJS.kill();
 
             // Instantiate sigma:
             data.graphJS = new sigma({
@@ -1190,25 +1181,6 @@
 
         };
 
-
-        fn.fordFukerson = function () {
-
-            // criar grafo Gf = G
-            // definir solução S = 0
-            var gf = fn.startGrafo(), S = 0;
-
-            console.log(gf);
-
-            // enquanto existir um caminho p de s até t na rede residual Gf faça
-            // cf  = min{ cf(u,v) : (u,v) está em p}
-            // para cada aresta em (u,v) em p faça
-            // c[u,v]   =   c[u,v] - cf(p)
-            // c[v,u]   =   c[v,u] + cf(p)
-            // S = S + cf(p)
-
-
-        };
-
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
          * ####################################################
@@ -1257,16 +1229,20 @@
                 fn.addVertice();
                 fn.addVertice();
 
-                fn.addAresta('A', 'B', 16);
-                fn.addAresta('A', 'C', 13);
-                fn.addAresta('B', 'C', 10);
-                fn.addAresta('B', 'D', 12);
-                fn.addAresta('C', 'B', 4);
-                fn.addAresta('C', 'E', 14);
-                fn.addAresta('D', 'B', 9);
-                fn.addAresta('E', 'D', 7);
-                fn.addAresta('D', 'F', 20);
-                fn.addAresta('E', 'F', 4);
+                fn.addAresta('A', 'C', 7);
+                fn.addAresta('A', 'D', 2);
+                fn.addAresta('A', 'E', 10);
+
+                fn.addAresta('B', 'C', 3);
+                fn.addAresta('B', 'F', 2);
+
+                fn.addAresta('C', 'E', 9);
+                fn.addAresta('C', 'F', 3);
+
+                fn.addAresta('D', 'E', 7);
+                fn.addAresta('D', 'F', 4);
+
+                fn.addAresta('E', 'F', 8);
 
 
                 //TESTE CAIXEIRO VIAJANTE
