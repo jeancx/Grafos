@@ -1256,6 +1256,48 @@
             //fn.alert(JSON.stringify(caminhos+" "+distancia));
         }
 
+        fn.FF = function () {
+            var grafo = fn.startGrafo();
+            
+            var vertices = data.grafo.vertices;
+            //grafo[posInicial].vizinhos.length
+            var origem = 99;
+            var destino = 99;
+
+            for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+                grafo[vertices[indiceA]].origem = 0;
+                grafo[vertices[indiceA]].destino = 0;
+            }
+            for (var indice = 0; indice < vertices.length; indice++) {
+                for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+                    for( var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
+                        console.log(grafo[vertices[indiceA]].vizinhos[indiceB]);
+                        console.log("+++",grafo[vertices[indice]].nome,"+++",grafo[vertices[indiceA]].vizinhos[indiceB].nome,"+++")
+                        if (grafo[vertices[indice]].nome == grafo[vertices[indiceA]].vizinhos[indiceB].nome) {
+                            
+                            grafo[vertices[indice]].destino++;
+                        }
+
+                    }
+                }
+                if (grafo[vertices[indice]].vizinhos.length == 0 ){
+                    destino = indice;
+                }
+            }
+            for (var indiceC = 0; indiceC < vertices.length; indiceC++) {
+                
+                if ( grafo[vertices[indiceC]].destino == 0){
+                    origem = indiceC;
+                }
+            }
+            console.log("fonte: ", grafo[vertices[origem]], "servidouro: ", grafo[vertices[destino]]);
+            console.log(grafo["A"].vizinhos)
+
+
+
+            fn.alert(JSON.stringify("FF"));
+        }
+
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
          * ####################################################
@@ -1289,7 +1331,7 @@
             };
             data.marginLeft = {'margin-left': '320px'};
             data.grafo = {
-                direcionado: false,
+                direcionado: true,
                 vertices: [],
                 arestas: []
             };
@@ -1297,62 +1339,74 @@
 
             $timeout(function () {
 
-/*                fn.addVertice();
+/*              fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-
                 fn.addAresta('A', 'C', 7);
                 fn.addAresta('A', 'D', 2);
                 fn.addAresta('A', 'E', 10);
-
                 fn.addAresta('B', 'C', 3);
                 fn.addAresta('B', 'F', 2);
-
                 fn.addAresta('C', 'E', 9);
                 fn.addAresta('C', 'F', 3);
-
                 fn.addAresta('D', 'E', 7);
                 fn.addAresta('D', 'F', 4);
-
                 fn.addAresta('E', 'F', 8);*/
 
 
                 //TESTE CAIXEIRO VIAJANTE
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addAresta('A', 'B', 5);
-                fn.addAresta('A', 'C', 15);
-                fn.addAresta('A', 'D', 4);
-                fn.addAresta('A', 'E', 5);
-                fn.addAresta('A', 'F', 12);
-                fn.addAresta('A', 'G', 10);
-                fn.addAresta('B', 'C', 8);
-                fn.addAresta('B', 'D', 15);
-                fn.addAresta('B', 'E', 3);
-                fn.addAresta('B', 'F', 9);
-                fn.addAresta('B', 'G', 12);
-                fn.addAresta('C', 'D', 8);
-                fn.addAresta('C', 'E', 8);
-                fn.addAresta('C', 'F', 5);
-                fn.addAresta('C', 'G', 5);
-                fn.addAresta('D', 'E', 8);
-                fn.addAresta('D', 'F', 6);
-                fn.addAresta('D', 'G', 11);
-                fn.addAresta('E', 'F', 20);
-                fn.addAresta('E', 'G', 7);
-                fn.addAresta('F', 'G', 11);
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addVertice();
+                // fn.addAresta('A', 'B', 5);
+                // fn.addAresta('A', 'C', 15);
+                // fn.addAresta('A', 'D', 4);
+                // fn.addAresta('A', 'E', 5);
+                // fn.addAresta('A', 'F', 12);
+                // fn.addAresta('A', 'G', 10);
+                // fn.addAresta('B', 'C', 8);
+                // fn.addAresta('B', 'D', 15);
+                // fn.addAresta('B', 'E', 3);
+                // fn.addAresta('B', 'F', 9);
+                // fn.addAresta('B', 'G', 12);
+                // fn.addAresta('C', 'D', 8);
+                // fn.addAresta('C', 'E', 8);
+                // fn.addAresta('C', 'F', 5);
+                // fn.addAresta('C', 'G', 5);
+                // fn.addAresta('D', 'E', 8);
+                // fn.addAresta('D', 'F', 6);
+                // fn.addAresta('D', 'G', 11);
+                // fn.addAresta('E', 'F', 20);
+                // fn.addAresta('E', 'G', 7);
+                // fn.addAresta('F', 'G', 11);
 
                 //fn.TSPV('A');
-                fn.TSP();
+                //fn.TSP();
 
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addAresta('A','B', 16)
+                fn.addAresta('A','C', 13)
+                fn.addAresta('B','C', 10)
+                fn.addAresta('B','D', 12)
+                fn.addAresta('C','B', 4)
+                fn.addAresta('C','E', 14)
+                fn.addAresta('D','C', 9)
+                fn.addAresta('D','F', 20)
+                fn.addAresta('E','D', 7)
+                fn.addAresta('E','F', 4)
+                fn.FF();
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
