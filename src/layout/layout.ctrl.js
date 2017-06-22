@@ -413,7 +413,8 @@
                                 distancia: infinite,
                                 nome: vizinho[1],
                                 atual: false,
-                                peso: vizinho[2]
+                                peso: vizinho[2],
+                                fluxo: 0
                             });
                         }
                         if (!data.grafo.direcionado && vizinho[1] === nome) {
@@ -423,7 +424,8 @@
                                 distancia: infinite,
                                 nome: vizinho[0],
                                 atual: false,
-                                peso: vizinho[2]
+                                peso: vizinho[2],
+                                fluxo: 0,
                             });
                         }
                     });
@@ -1261,8 +1263,8 @@
             
             var vertices = data.grafo.vertices;
             //grafo[posInicial].vizinhos.length
-            var origem = 99;
-            var destino = 99;
+            var origem = [];
+            var destino = [];
 
             for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
                 grafo[vertices[indiceA]].origem = 0;
@@ -1281,20 +1283,202 @@
                     }
                 }
                 if (grafo[vertices[indice]].vizinhos.length == 0 ){
-                    destino = indice;
+                    destino.push(indice);
                 }
             }
             for (var indiceC = 0; indiceC < vertices.length; indiceC++) {
                 
                 if ( grafo[vertices[indiceC]].destino == 0){
-                    origem = indiceC;
+                    origem.push(indiceC);
                 }
             }
-            console.log("fonte: ", grafo[vertices[origem]], "servidouro: ", grafo[vertices[destino]]);
-            console.log(grafo["A"].vizinhos)
+            console.log("----------------------------------------")
+            console.log(origem)
+            console.log("----------------------------------------")
+            console.log(destino)
+            console.log("----------------------------------------")
+            console.log("fonte: ", grafo[vertices[origem[0]]], 
+                        "servidouro: ", grafo[vertices[destino[0]]]);
+            console.log("----------------------------------------")
 
 
+            var caminhos = [["A","B","C","E","F"],
+                            ["A","B","D","F"],
+                            ["A","B","D","C","E","F"],
+                            ["A","C","E","F"],
+                            ["A","C","B","D","F"],
+                            ["A","C","B","D","C","E","F"]];
+            console.log(caminhos);
 
+            // var grafoResidual = {
+            //     nome: null,
+            //     vizinhos: [{
+            //         nome: null,
+            //         peso: null,
+            //         fluxo: null}]
+            // };
+            console.log("+_+_+_+_+_+_+_+_+");
+ /*           console.log(grafoResidual);
+            var grafoResidual = grafo;
+            for(var indiceA;indiceA<vertices.length;indiceA++){
+                grafoResidual[indiceA].nome = grafo[vertices[indiceA]].nome;
+                for(var indiceB;indiceB<grafo[vertices[indiceA]].vizinhos.length;indiceB++){
+                    grafoResidual[indiceA].vizinhos[indiceB].nome = grafo[vertices[indiceA]].vizinhos[indiceB].nome;
+                    grafoResidual[indiceA].vizinhos[indiceB].peso = grafo[vertices[indiceA]].vizinhos[indiceB].peso;
+                    grafoResidual[indiceA].vizinhos[indiceB].fluxo = 0;
+                }
+            }
+            console.log("+_+_+_+_+_+_+_+_+");
+            console.log(grafoResidual);
+            var fn_ehvizinho = function (v,n){
+                for(indiceA = 0;indiceA<v.length;indiceA++){
+                    if(v[indiceA].nome == n) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+
+            var soma = 0;
+            var caminho = caminhos[0];
+            var menorCapacidade = 999;
+            var fluxomaximo = 0;
+            for(var indiceA = 0;indiceA < caminho.length;indiceA++){
+                for(indiceB = 0;indiceB < grafoResidual[caminho[indiceA]].vizinhos.length;indiceB++) {
+                    if(grafoResidual[caminho[indiceA]].vizinhos[indiceB].nome == caminho[indiceA+1]){
+                        if (grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso < menorCapacidade && grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso != 0 ){
+                            menorCapacidade = grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso;
+                        }
+                        soma += grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso;
+                        console.log(soma);
+                    }
+                }
+            }
+            for(var indiceA = 0;indiceA < caminho.length;indiceA++){
+                for(indiceB = 0;indiceB < grafoResidual[caminho[indiceA]].vizinhos.length;indiceB++) {
+                    if(!fn_ehvizinho(grafoResidual[vizinhos[indiceB].nome].vizinhos,caminho[indiceA])){
+                            grafoResidual[vizinhos[indiceB].nome].vizinhos.push({
+                                aberto: true,
+                                anterior: null,
+                                distancia: infinite,
+                                nome: caminho[indiceA],
+                                atual: false,
+                                peso: vizinho[2],
+                                fluxo: menorCapacidade
+                            });
+                    }
+                    grafoResidual[caminho[indiceA]].vizinhos[indiceB].fluxo = menorCapacidade;
+                    grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso -= menorCapacidade;
+                }
+            }
+        */
+ 
+
+            // Represents an ff_vertice from origem to destino with capacidade
+            var ff_vertice = function(origem, destino, capacidade) {
+                this.origem = origem;
+                this.destino = destino;
+                this.capacidade = capacidade;
+                this.retorno = null;
+                this.fluxo = 0;
+            };
+
+                                // Represents an ff_vertice from origem to destino with capacidade
+            var ff_vertice = function(origem, destino, capacidade) {
+                this.origem = origem;
+                this.destino = destino;
+                this.capacidade = capacidade;
+                this.reverso = null;
+                this.fluxo = 0;
+            };
+            var ff_vertices = {origem: [], destino: []};
+            // Main class to manage the network
+            var fluxoNetwork = function() {
+                
+
+                // Is this ff_vertice/residual capacidade combination in the caminho already?
+                this.ff_verticenoCaminho = function(caminho, ff_vertice, residual) {
+                    for(var p=0;p<caminho.length;p++) 
+                        if(caminho[p][0] == ff_vertice && caminho[p][1] == residual) 
+                            return true;
+                    return false;
+                };
+                
+                this.addff_vertice = function(origem, destino, capacidade) {
+                    if(origem == destino) return;
+                    
+                    // Create the two ff_vertices = one being the reverse of the other    
+                    var ff_ver = new ff_vertice(origem, destino, capacidade);
+                    var reverso = new ff_vertice(destino, origem, 0);
+                    
+                    // Make sure we setup the pointer to the reverse ff_vertice
+                    ff_ver.reverso = reverso;
+                    reverso.reverso = ff_ver;
+                    
+                    if(ff_vertices[origem] === undefined) ff_vertices[origem] = [];
+                    if(ff_vertices[destino] === undefined) ff_vertices[destino] = [];   
+                    
+                    ff_vertices[origem].push(ff_ver);
+                    ff_vertices[destino].push(reverso);
+                    //console.log(ff_vertices[origem],"ksdfasdf",ff_ver)
+                };
+                
+                // Finds a caminho from origem to destino
+                this.dfs = function(origem, destino, caminho) {
+                    if(origem == destino) return caminho;
+                    
+                    for(var i=0;i<ff_vertices[origem].length;i++) {
+                        var ff_ver = ff_vertices[origem][i];
+                        var residual = ff_ver.capacidade - ff_vertice.fluxo;
+                        
+                        // If we have capacidade and we haven't already visited this ff_vertice, visit it
+                        if(residual > 0 && !this.ff_verticenoCaminho(caminho, ff_ver, residual)) {
+                            var tcaminho = caminho.slice(0);
+                            tcaminho.push([ff_ver, residual]);
+                            var resultado = this.dfs(ff_ver.destino, destino, tcaminho);
+                            if(resultado != null) return resultado;
+                        } 
+                    }
+                    return null;
+                };
+                
+                // Find the max fluxo in this network
+                this.fluxoMaximo = function(origem, destino) {
+                    var caminho = this.dfs(origem, destino, []);
+                    while(caminho != null) {
+                        var fluxo = 999999;
+                        // Find the minimum fluxo
+                        for(var i=0;i<caminho.length;i++)
+                            if(caminho[i][1] < fluxo) {
+                                fluxo = caminho[i][1];
+                            }
+                        // Apply the fluxo to the ff_vertice and the reverse ff_vertice
+                        for(var i=0;i<caminho.length;i++) {
+                            caminho[i][0].fluxo += fluxo;
+                            caminho[i][0].reverso.fluxo -= fluxo;
+                        } 
+                        caminho = this.dfs(origem, destino, []);
+                    }
+                    var fluxomaximo = 0;
+                    for(var i=0;i<ff_vertices[origem].length;i++)
+                        fluxomaximo += ff_vertices[origem][i].fluxo;
+                    return fluxomaximo;
+                };
+            };
+
+            var ford = new fluxoNetwork();
+            //var max = fn.maxFlow(grafo[ff_vertices[origem[0]]],grafo[ff_vertices[destino[0]]]);
+            for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+                for( var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
+                    ford.addff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome,grafo[vertices[indiceA]].vizinhos[indiceB].peso);
+                }
+            }
+            console.log(ford.ff_vertices);
+            console.log("============================");
+            console.log(ford.fluxoMaximo("A","F"));
+
+            //console.log(soma, menorCapacidade);
+            //console.log(grafoResidual);
             fn.alert(JSON.stringify("FF"));
         }
 
@@ -1407,6 +1591,7 @@
                 fn.addAresta('E','D', 7)
                 fn.addAresta('E','F', 4)
                 fn.FF();
+
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
