@@ -413,7 +413,8 @@
                                 distancia: infinite,
                                 nome: vizinho[1],
                                 atual: false,
-                                peso: vizinho[2]
+                                peso: vizinho[2],
+                                fluxo: 0
                             });
                         }
                         if (!data.grafo.direcionado && vizinho[1] === nome) {
@@ -423,7 +424,8 @@
                                 distancia: infinite,
                                 nome: vizinho[0],
                                 atual: false,
-                                peso: vizinho[2]
+                                peso: vizinho[2],
+                                fluxo: 0,
                             });
                         }
                     });
@@ -1148,38 +1150,272 @@
             );
 
         };
+            fn.exist = function (nome,lista) {
+                for (var i = 0; i < lista.length;i++){
+                 if (lista[i] == nome) {
+                     return true;
+                 }
+             
+                }
+                return false;
+             
+            }
 
-        fn.TSP = function () {
+        fn.TSPV = function (inicio) {
 
             // Inicializar todos os vértices como: aberto, sem vértice anterior , distância infinita
             var grafo = fn.startGrafo();
             var stop = false;
-            var caminhos = [];
+            var caminho = [];
+            var menor = [];
             var vertices = data.grafo.vertices;
+            var posInicial = inicio;
+            var distancia = 0;
+            //console.log(vertices);
+            //console.log("grafo",grafo);
+            
 
-            var _recursiveRun = function (start, visitados, caminho, p) {
-                if (p < grafo[start].vizinhos.length) {
-                    if (visitados.indexOf(grafo[start].vizinhos[p]) === -1) {
-                        visitados.push(grafo[start].vizinhos[p].nome);
-                        caminho.push({nome: grafo[start].vizinhos[p].nome, peso: grafo[start].vizinhos[p].peso});
-                        $timeout(function () {
-                            var x = _recursiveRun(grafo[start].vizinhos[p].nome, visitados, caminho, p + 1);
-                            if (x) {
-                                caminho.push(x);
-                            }
-                        });
+            //fn.retornaMenor = function (v) {
+            
+            //}
+
+            caminho.push(posInicial);
+            //console.log("c:", caminho);
+            var num = 0;
+            while (true) {
+                //console.log("run: ", num);
+                var menorDistancia = 99999;
+                var menorVertice;
+                for (var indiceA = 0;indiceA < grafo[posInicial].vizinhos.length;indiceA++){
+                    //console.log(indiceA,grafo[posInicial].vizinhos[indiceA]);
+                    if (  grafo[posInicial].vizinhos[indiceA].peso < menorDistancia &&  !fn.exist(grafo[posInicial].vizinhos[indiceA].nome,caminho)) {
+                        menorDistancia = grafo[posInicial].vizinhos[indiceA].peso;
+                        menorVertice = grafo[posInicial].vizinhos[indiceA].nome;
                     }
+                    
+                //console.log("menor: ",menorVertice);
                 }
-                if (caminho && caminhos.indexOf(caminho) === -1) {
-                    caminhos.push(caminho);
+                if(menorVertice === posInicial) {
+                    break;
                 }
-            };
+                caminho.push(menorVertice);
+                distancia += menorDistancia;
+                num += 1;
+                posInicial = menorVertice;
+            }
+            console.log("Caminho do vertice:",inicio," ", caminho, "Distancia: ",distancia );
+            return [caminho, distancia];
+            
+            // var _recursiveRun = function (start, visitados, caminho, p) {
+            //     if (p < grafo[start].vizinhos.length) {
+            //         if (visitados.indexOf(grafo[start].vizinhos[p]) === -1) {
+            //             visitados.push(grafo[start].vizinhos[p].nome);
+            //             caminho.push({nome: grafo[start].vizinhos[p].nome, peso: grafo[start].vizinhos[p].peso});
+            //             $timeout(function () {
+            //                 var x = _recursiveRun(grafo[start].vizinhos[p].nome, visitados, caminho, p + 1);
+            //                 if (x) {
+            //                     caminho.push(x);
+            //                 }
+            //             });
+            //         }
+            //     }
+            //     if (caminho && caminhos.indexOf(caminho) === -1) {
+            //         caminhos.push(caminho);
+            //     }
+            // };
 
-            _recursiveRun(vertices[0], [], [], 0);
+            // _recursiveRun(vertices[0], [], [], 0);
 
-            fn.alert(JSON.stringify(caminhos));
+
+            //fn.alert(JSON.stringify(caminhos+" "+distancia));
+
 
         };
+
+        fn.TSP = function () {
+            //var fo = fn.startGrafo();
+            var vertices = data.grafo.vertices;
+            //console.log(vertices);
+            var caminhos = [];
+            
+            for (var indice = 0;indice < vertices.length;indice++){
+                //console.log("JASEFHAKSGFH: ", vertices[indice]);
+                caminhos.push(fn.TSPV(vertices[indice]));
+            }
+
+            var menor = 9999;
+            var indiceMenor;
+            //console.log("FIM");
+            //console.log(caminhos);
+            for (var indiceB = 0;indiceB < caminhos.length ;indiceB++) {
+                if ( caminhos[indiceB][1] < menor ){
+                    menor = caminhos[indiceB][1];
+                    indiceMenor = indiceB;
+                }
+            }
+            console.log("Menor Caminho do Grafo: ", caminhos[indiceMenor]);
+            fn.alert(JSON.stringify("Menor Caminho do Grafo: "+ caminhos[indiceMenor]));
+            //fn.alert(JSON.stringify(caminhos+" "+distancia));
+        }
+
+        fn.FF = function () {
+            var grafo = fn.startGrafo();
+            
+            var vertices = data.grafo.vertices;
+            //grafo[posInicial].vizinhos.length
+            var origens = [];
+            var destinos = [];
+
+            for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+                grafo[vertices[indiceA]].origens = 0;
+                grafo[vertices[indiceA]].destinos = 0;
+            }
+            for (var indice = 0; indice < vertices.length; indice++) {
+                for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+                    for( var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
+                        console.log(grafo[vertices[indiceA]].vizinhos[indiceB]);
+                        console.log("+++",grafo[vertices[indice]].nome,"+++",grafo[vertices[indiceA]].vizinhos[indiceB].nome,"+++")
+                        if (grafo[vertices[indice]].nome == grafo[vertices[indiceA]].vizinhos[indiceB].nome) {
+                            
+                            grafo[vertices[indice]].destinos++;
+                        }
+
+                    }
+                }
+                if (grafo[vertices[indice]].vizinhos.length == 0 ){
+                    destinos.push(indice);
+                }
+            }
+            for (var indiceC = 0; indiceC < vertices.length; indiceC++) {
+                
+                if ( grafo[vertices[indiceC]].destinos == 0){
+                    origens.push(indiceC);
+                }
+            }
+
+            if(origens.length > 1){
+                vertices.push(vertices.length);
+                for(var indiceA;indiceA < origens.length; indiceA++){
+                    //grafo
+                }
+                //    "Z"
+            }
+
+            console.log("----------------------------------------")
+            console.log(origens)
+            console.log("----------------------------------------")
+            console.log(destinos)
+            console.log("----------------------------------------")
+            console.log("fonte: ", grafo[vertices[origens[0]]].nome, 
+                        "servidouro: ", grafo[vertices[destinos[0]]].nome);
+            console.log("----------------------------------------")
+
+
+            var ff_vertice = function(origem, destino, capacidade) {
+                this.origem = origem;
+                this.destino = destino;
+                this.capacidade = capacidade;
+                this.anterior = null;
+                this.fluxo = 0;
+            };
+
+            var ff_vertices = {origem: [], destino: []};
+
+            var add_ff_vertice = function(origem, destino, capacidade){
+                var aux_ver = new ff_vertice(origem, destino, capacidade);
+                var aux_rev = new ff_vertice(destino, origem, 0);
+                aux_ver.anterior = aux_rev;
+                aux_rev.anterior = aux_ver;
+                if(ff_vertices.origem == undefined){
+                    ff_vertices.origem = [];
+                }
+                if(ff_vertices.destino == undefined) {
+                    ff_vertices.destino = [];
+                }
+                console.log("pqpqpqpqpq");
+                console.log(aux_ver);
+                console.log("pqpqpqpqpq");
+                ff_vertices.origem.push(aux_ver);
+                ff_vertices.destino.push(aux_rev);
+                console.log("lllllllllllllllllll");
+                console.log(ff_vertices);
+            };
+
+            var ff_vertice_no_Caminho = function(caminho, ff_vertice, residual) {
+                for(var indice = 0; indice < caminho.length; indice++){
+                    if(caminho[indice][0] == ff_vertice && caminho[indice][1] == residual){
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            var ff_dfs = function(origem, destino, caminho) {
+                if(origem == destino) {
+                    return caminho;
+                }
+                for(var indiceA = 0;indiceA < ff_vertices.origem.length;indiceA++){
+                    var aux_ver = ff_vertices.origem[indiceA];
+                    var residual = aux_ver.capacidade - aux_ver.fluxo;
+                
+                    if(residual > 0 && !ff_vertice_no_Caminho(caminho, aux_ver, residual)) {
+                        var tcaminho = caminho.slice(0);
+                        tcaminho.push([aux_ver, residual]);
+                        var resultado = ff_dfs(aux_ver.destino, destino, tcaminho);
+                        if(resultado != null){
+                            return resultado;
+                        }
+                    }
+                }
+                return null;
+            };
+
+            var fluxo_maximo = function(fonte, servidouro) {
+                var caminho = ff_dfs(fonte, servidouro, []);
+                console.log("DDD",caminho);
+                while(caminho != null) {
+                    var aux_fluxo = 99999999999;
+                    for(var indice = 0;indice < caminho.length;indice++) {
+                        console.log("i: ",indice,caminho);
+                        if(caminho[indice][1] < aux_fluxo){
+                            aux_fluxo = caminho[indice][1];
+                        }
+                    }
+                    for(var indice = 0;indice < caminho.length; indice++) {
+                        caminho[indice][0].fluxo += aux_fluxo;
+                        caminho[indice][0].anterior.fluxo -= aux_fluxo;
+                        console.log(caminho[indice][0].fluxo);
+                    } 
+                    caminho = ff_dfs(fonte, servidouro, []);
+                }
+                var soma = 0;
+                console.log("mirainikki", ff_vertices);
+                for(var indice = 0; indice < ff_vertices.origem.length;indice++){
+                    soma += ff_vertices.origem[indice].capacidade;
+                }
+                //return soma;
+                var ret = 0;
+                for(var indice = 0; indice < ff_vertices.destino.length;indice++){
+                    ret += ff_vertices.destino[indice].fluxo;
+                }
+                return soma;
+            };
+
+            for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+                for(var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
+                    add_ff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome,grafo[vertices[indiceA]].vizinhos[indiceB].peso);
+                }
+            }
+
+            console.log("=========VERTICES==========");
+            console.log(ff_vertices);
+            console.log("============================");
+            console.log("fluxo maximo: ", fluxo_maximo("A","F"));
+
+            //console.log(soma, menorCapacidade);
+            //console.log(grafoResidual);
+            fn.alert(JSON.stringify("FF"));
+        }
 
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
@@ -1214,7 +1450,7 @@
             };
             data.marginLeft = {'margin-left': '320px'};
             data.grafo = {
-                direcionado: false,
+                direcionado: true,
                 vertices: [],
                 arestas: []
             };
@@ -1222,27 +1458,22 @@
 
             $timeout(function () {
 
+/*              fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addVertice();
-
                 fn.addAresta('A', 'C', 7);
                 fn.addAresta('A', 'D', 2);
                 fn.addAresta('A', 'E', 10);
-
                 fn.addAresta('B', 'C', 3);
                 fn.addAresta('B', 'F', 2);
-
                 fn.addAresta('C', 'E', 9);
                 fn.addAresta('C', 'F', 3);
-
                 fn.addAresta('D', 'E', 7);
                 fn.addAresta('D', 'F', 4);
-
-                fn.addAresta('E', 'F', 8);
+                fn.addAresta('E', 'F', 8);*/
 
 
                 //TESTE CAIXEIRO VIAJANTE
@@ -1275,7 +1506,27 @@
                 // fn.addAresta('E', 'G', 7);
                 // fn.addAresta('F', 'G', 11);
 
+                //fn.TSPV('A');
                 //fn.TSP();
+
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addVertice();
+                fn.addAresta('A','B', 16)
+                fn.addAresta('A','C', 13)
+                fn.addAresta('B','C', 10)
+                fn.addAresta('B','D', 12)
+                fn.addAresta('C','B', 4)
+                fn.addAresta('C','E', 14)
+                fn.addAresta('D','C', 9)
+                fn.addAresta('D','F', 20)
+                fn.addAresta('E','D', 7)
+                fn.addAresta('E','F', 4)
+                fn.FF();
+
             }, 1000);
             $timeout(function () {
                 data.graphJS = new sigma({graph: {}, container: 'graph-container'});
