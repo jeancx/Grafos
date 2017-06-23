@@ -1263,12 +1263,12 @@
             
             var vertices = data.grafo.vertices;
             //grafo[posInicial].vizinhos.length
-            var origem = [];
-            var destino = [];
+            var origens = [];
+            var destinos = [];
 
             for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
-                grafo[vertices[indiceA]].origem = 0;
-                grafo[vertices[indiceA]].destino = 0;
+                grafo[vertices[indiceA]].origens = 0;
+                grafo[vertices[indiceA]].destinos = 0;
             }
             for (var indice = 0; indice < vertices.length; indice++) {
                 for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
@@ -1277,205 +1277,126 @@
                         console.log("+++",grafo[vertices[indice]].nome,"+++",grafo[vertices[indiceA]].vizinhos[indiceB].nome,"+++")
                         if (grafo[vertices[indice]].nome == grafo[vertices[indiceA]].vizinhos[indiceB].nome) {
                             
-                            grafo[vertices[indice]].destino++;
+                            grafo[vertices[indice]].destinos++;
                         }
 
                     }
                 }
                 if (grafo[vertices[indice]].vizinhos.length == 0 ){
-                    destino.push(indice);
+                    destinos.push(indice);
                 }
             }
             for (var indiceC = 0; indiceC < vertices.length; indiceC++) {
                 
-                if ( grafo[vertices[indiceC]].destino == 0){
-                    origem.push(indiceC);
+                if ( grafo[vertices[indiceC]].destinos == 0){
+                    origens.push(indiceC);
                 }
             }
-            console.log("----------------------------------------")
-            console.log(origem)
-            console.log("----------------------------------------")
-            console.log(destino)
-            console.log("----------------------------------------")
-            console.log("fonte: ", grafo[vertices[origem[0]]], 
-                        "servidouro: ", grafo[vertices[destino[0]]]);
-            console.log("----------------------------------------")
 
-
-            var caminhos = [["A","B","C","E","F"],
-                            ["A","B","D","F"],
-                            ["A","B","D","C","E","F"],
-                            ["A","C","E","F"],
-                            ["A","C","B","D","F"],
-                            ["A","C","B","D","C","E","F"]];
-            console.log(caminhos);
-
-            // var grafoResidual = {
-            //     nome: null,
-            //     vizinhos: [{
-            //         nome: null,
-            //         peso: null,
-            //         fluxo: null}]
-            // };
-            console.log("+_+_+_+_+_+_+_+_+");
- /*           console.log(grafoResidual);
-            var grafoResidual = grafo;
-            for(var indiceA;indiceA<vertices.length;indiceA++){
-                grafoResidual[indiceA].nome = grafo[vertices[indiceA]].nome;
-                for(var indiceB;indiceB<grafo[vertices[indiceA]].vizinhos.length;indiceB++){
-                    grafoResidual[indiceA].vizinhos[indiceB].nome = grafo[vertices[indiceA]].vizinhos[indiceB].nome;
-                    grafoResidual[indiceA].vizinhos[indiceB].peso = grafo[vertices[indiceA]].vizinhos[indiceB].peso;
-                    grafoResidual[indiceA].vizinhos[indiceB].fluxo = 0;
+            if(origens.length > 1){
+                vertices.push(vertices.length);
+                for(var indiceA;indiceA < origens.length; indiceA++){
+                    //grafo
                 }
+                //    "Z"
             }
-            console.log("+_+_+_+_+_+_+_+_+");
-            console.log(grafoResidual);
-            var fn_ehvizinho = function (v,n){
-                for(indiceA = 0;indiceA<v.length;indiceA++){
-                    if(v[indiceA].nome == n) {
+
+            console.log("----------------------------------------")
+            console.log(origens)
+            console.log("----------------------------------------")
+            console.log(destinos)
+            console.log("----------------------------------------")
+            console.log("fonte: ", grafo[vertices[origens[0]]].nome, 
+                        "servidouro: ", grafo[vertices[destinos[0]]].nome);
+            console.log("----------------------------------------")
+
+
+            var ff_vertice = function(origem, destino, capacidade) {
+                this.origem = origem;
+                this.destino = destino;
+                this.capacidade = capacidade;
+                this.anterior = null;
+                this.fluxo = 0;
+            };
+
+            var ff_vertices = {origem: [], destino: []};
+
+            var add_ff_vertice = function(origem, destino, capacidade){
+                var aux_ver = new ff_vertice(origem, destino, capacidade);
+                var aux_rev = new ff_vertice(destino, origem, 0);
+                aux_ver.anterior = aux_rev;
+                aux_rev.anterior = aux_ver;
+                if(ff_vertices[origem] == undefined){
+                    ff_vertices[origem] = [];
+                }
+                if(ff_vertices[destino] == undefined) {
+                    ff_vertices[destino] = [];
+                }
+                ff_vertices[origem].push(aux_ver);
+                ff_vertices[destino].push(aux_rev);
+            };
+
+            var ff_vertice_no_Caminho = function(caminho, ff_vertice, residual) {
+                for(var indice = 0; indice < caminho.length; indice++){
+                    if(caminho[indice][0] == ff_vertice && caminho[indice][1] == residual){
                         return true;
                     }
                 }
                 return false;
+            }
+
+            var ff_dfs = function(origem, destino, caminho) {
+                if(origem == destino) {
+                    return caminho;
+                }
+                for(var indiceA = 0;indiceA < ff_vertices[origem].length;indiceA++){
+                    var aux_ver = ff_vertices[origem][indiceA];
+                    var residual = aux_ver.capacidade - aux_ver.fluxo;
+                }
+                if(residual > 0 && ! ff_vertice_no_Caminho(caminho, aux_ver, residual)) {
+                    var tcaminho = caminho.slice(0);
+                    tcaminho.push([aux_ver, residual]);
+                    var resultado = ff_dfs(aux_ver.destino, destino, tcaminho);
+                    if(resultado != null){
+                        return resultado;
+                    }
+                }
+                return null;
             };
 
-            var soma = 0;
-            var caminho = caminhos[0];
-            var menorCapacidade = 999;
-            var fluxomaximo = 0;
-            for(var indiceA = 0;indiceA < caminho.length;indiceA++){
-                for(indiceB = 0;indiceB < grafoResidual[caminho[indiceA]].vizinhos.length;indiceB++) {
-                    if(grafoResidual[caminho[indiceA]].vizinhos[indiceB].nome == caminho[indiceA+1]){
-                        if (grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso < menorCapacidade && grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso != 0 ){
-                            menorCapacidade = grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso;
+            var fluxo_maximo = function(fonte, servidouro) {
+                var caminho = ff_dfs(fonte, servidouro, []);
+                while(caminho != null) {
+                    var fluxo = 9999;
+                    for(var indice = 0;indice < caminho.length;indice++) {
+                        if(caminho[indice][1] < fluxo){
+                            fluxo = caminho[indice][1];
                         }
-                        soma += grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso;
-                        console.log(soma);
                     }
+                    for(var indice = 0;indice < caminho.length; i++) {
+                        caminho[i][0].fluxo += fluxo;
+                        caminho[i][0].anterior.fluxo -= fluxo;
+                    } 
+                    caminho = ff_dfs(fonte, servidouro, []);
                 }
-            }
-            for(var indiceA = 0;indiceA < caminho.length;indiceA++){
-                for(indiceB = 0;indiceB < grafoResidual[caminho[indiceA]].vizinhos.length;indiceB++) {
-                    if(!fn_ehvizinho(grafoResidual[vizinhos[indiceB].nome].vizinhos,caminho[indiceA])){
-                            grafoResidual[vizinhos[indiceB].nome].vizinhos.push({
-                                aberto: true,
-                                anterior: null,
-                                distancia: infinite,
-                                nome: caminho[indiceA],
-                                atual: false,
-                                peso: vizinho[2],
-                                fluxo: menorCapacidade
-                            });
-                    }
-                    grafoResidual[caminho[indiceA]].vizinhos[indiceB].fluxo = menorCapacidade;
-                    grafoResidual[caminho[indiceA]].vizinhos[indiceB].peso -= menorCapacidade;
+                var soma = 0;
+                console.log(ff_vertices[origem].length);
+                for(var indice = 0; indice < ff_vertices[origem].length;indice++){
+                    soma += ff_vertices[origem][indice].fluxo;
                 }
-            }
-        */
- 
-
-            // Represents an ff_vertice from origem to destino with capacidade
-            var ff_vertice = function(origem, destino, capacidade) {
-                this.origem = origem;
-                this.destino = destino;
-                this.capacidade = capacidade;
-                this.retorno = null;
-                this.fluxo = 0;
+                return soma;
             };
 
-                                // Represents an ff_vertice from origem to destino with capacidade
-            var ff_vertice = function(origem, destino, capacidade) {
-                this.origem = origem;
-                this.destino = destino;
-                this.capacidade = capacidade;
-                this.reverso = null;
-                this.fluxo = 0;
-            };
-            var ff_vertices = {origem: [], destino: []};
-            // Main class to manage the network
-            var fluxoNetwork = function() {
-                
-
-                // Is this ff_vertice/residual capacidade combination in the caminho already?
-                this.ff_verticenoCaminho = function(caminho, ff_vertice, residual) {
-                    for(var p=0;p<caminho.length;p++) 
-                        if(caminho[p][0] == ff_vertice && caminho[p][1] == residual) 
-                            return true;
-                    return false;
-                };
-                
-                this.addff_vertice = function(origem, destino, capacidade) {
-                    if(origem == destino) return;
-                    
-                    // Create the two ff_vertices = one being the reverse of the other    
-                    var ff_ver = new ff_vertice(origem, destino, capacidade);
-                    var reverso = new ff_vertice(destino, origem, 0);
-                    
-                    // Make sure we setup the pointer to the reverse ff_vertice
-                    ff_ver.reverso = reverso;
-                    reverso.reverso = ff_ver;
-                    
-                    if(ff_vertices[origem] === undefined) ff_vertices[origem] = [];
-                    if(ff_vertices[destino] === undefined) ff_vertices[destino] = [];   
-                    
-                    ff_vertices[origem].push(ff_ver);
-                    ff_vertices[destino].push(reverso);
-                    //console.log(ff_vertices[origem],"ksdfasdf",ff_ver)
-                };
-                
-                // Finds a caminho from origem to destino
-                this.dfs = function(origem, destino, caminho) {
-                    if(origem == destino) return caminho;
-                    
-                    for(var i=0;i<ff_vertices[origem].length;i++) {
-                        var ff_ver = ff_vertices[origem][i];
-                        var residual = ff_ver.capacidade - ff_vertice.fluxo;
-                        
-                        // If we have capacidade and we haven't already visited this ff_vertice, visit it
-                        if(residual > 0 && !this.ff_verticenoCaminho(caminho, ff_ver, residual)) {
-                            var tcaminho = caminho.slice(0);
-                            tcaminho.push([ff_ver, residual]);
-                            var resultado = this.dfs(ff_ver.destino, destino, tcaminho);
-                            if(resultado != null) return resultado;
-                        } 
-                    }
-                    return null;
-                };
-                
-                // Find the max fluxo in this network
-                this.fluxoMaximo = function(origem, destino) {
-                    var caminho = this.dfs(origem, destino, []);
-                    while(caminho != null) {
-                        var fluxo = 999999;
-                        // Find the minimum fluxo
-                        for(var i=0;i<caminho.length;i++)
-                            if(caminho[i][1] < fluxo) {
-                                fluxo = caminho[i][1];
-                            }
-                        // Apply the fluxo to the ff_vertice and the reverse ff_vertice
-                        for(var i=0;i<caminho.length;i++) {
-                            caminho[i][0].fluxo += fluxo;
-                            caminho[i][0].reverso.fluxo -= fluxo;
-                        } 
-                        caminho = this.dfs(origem, destino, []);
-                    }
-                    var fluxomaximo = 0;
-                    for(var i=0;i<ff_vertices[origem].length;i++)
-                        fluxomaximo += ff_vertices[origem][i].fluxo;
-                    return fluxomaximo;
-                };
-            };
-
-            var ford = new fluxoNetwork();
-            //var max = fn.maxFlow(grafo[ff_vertices[origem[0]]],grafo[ff_vertices[destino[0]]]);
             for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
-                for( var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
-                    ford.addff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome,grafo[vertices[indiceA]].vizinhos[indiceB].peso);
+                for(var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
+                    add_ff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome,grafo[vertices[indiceA]].vizinhos[indiceB].peso);
                 }
             }
-            console.log(ford.ff_vertices);
+
+            console.log("=========VERTICES==========");
+            console.log(ff_vertices);
             console.log("============================");
-            console.log(ford.fluxoMaximo("A","F"));
+            console.log(fluxo_maximo("A","F"));
 
             //console.log(soma, menorCapacidade);
             //console.log(grafoResidual);
