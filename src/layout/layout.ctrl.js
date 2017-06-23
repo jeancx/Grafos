@@ -1273,8 +1273,8 @@
             for (var indice = 0; indice < vertices.length; indice++) {
                 for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
                     for( var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
-                        console.log(grafo[vertices[indiceA]].vizinhos[indiceB]);
-                        console.log("+++",grafo[vertices[indice]].nome,"+++",grafo[vertices[indiceA]].vizinhos[indiceB].nome,"+++")
+                        //console.log(grafo[vertices[indiceA]].vizinhos[indiceB]);
+                        //console.log("+++",grafo[vertices[indice]].nome,"+++",grafo[vertices[indiceA]].vizinhos[indiceB].nome,"+++")
                         if (grafo[vertices[indice]].nome == grafo[vertices[indiceA]].vizinhos[indiceB].nome) {
                             
                             grafo[vertices[indice]].destinos++;
@@ -1295,10 +1295,24 @@
 
             if(origens.length > 1){
                 vertices.push(vertices.length);
+                data.grafo.vertices.push("Y");
                 for(var indiceA;indiceA < origens.length; indiceA++){
-                    //grafo
+                    addAresta("Y",grafo[vertices[origens[indiceA]]],99999);
                 }
-                //    "Z"
+                var fonte = grafo[vertices[origens[indiceA]]];
+            }else {
+                var fonte = grafo[vertices[origens[0]]].nome;
+            }
+            if(destinos.length > 1){
+                vertices.push(vertices.length);
+                data.grafo.vertices.push("Z");
+                for(var indiceA;indiceA < destinos.length; indiceA++){
+                    //grafo
+                    addAresta("Z",grafo[vertices[destinos[indiceA]]],99999);
+                }
+                var fonte = grafo[vertices[destinos[indiceA]]];
+            }else {
+                var servidouro = grafo[vertices[destinos[0]]].nome;
             }
 
             console.log("----------------------------------------")
@@ -1311,19 +1325,20 @@
             console.log("----------------------------------------")
 
 
-            var ff_vertice = function(origem, destino, capacidade) {
+            var ff_vertice = function(origem, destino, capacidade, fluxo) {
                 this.origem = origem;
                 this.destino = destino;
                 this.capacidade = capacidade;
                 this.anterior = null;
-                this.fluxo = 0;
+                this.fluxo = fluxo;
+                this.visitado = false;
             };
 
             var ff_vertices = {origem: [], destino: []};
 
             var add_ff_vertice = function(origem, destino, capacidade){
-                var aux_ver = new ff_vertice(origem, destino, capacidade);
-                var aux_rev = new ff_vertice(destino, origem, 0);
+                var aux_ver = new ff_vertice(origem, destino, capacidade, 0);
+                var aux_rev = new ff_vertice(destino, origem, 0, 0);
                 aux_ver.anterior = aux_rev;
                 aux_rev.anterior = aux_ver;
                 if(ff_vertices.origem == undefined){
@@ -1332,18 +1347,21 @@
                 if(ff_vertices.destino == undefined) {
                     ff_vertices.destino = [];
                 }
-                console.log("pqpqpqpqpq");
-                console.log(aux_ver);
-                console.log("pqpqpqpqpq");
+                //console.log("pqpqpqpqpq");
+                //console.log(aux_ver);
+                //console.log("pqpqpqpqpq");
                 ff_vertices.origem.push(aux_ver);
                 ff_vertices.destino.push(aux_rev);
-                console.log("lllllllllllllllllll");
-                console.log(ff_vertices);
+                //console.log("lllllllllllllllllll");
+                //console.log(ff_vertices);
             };
 
             var ff_vertice_no_Caminho = function(caminho, ff_vertice, residual) {
+                //console.log("caminho: ", caminho);
+                
                 for(var indice = 0; indice < caminho.length; indice++){
                     if(caminho[indice][0] == ff_vertice && caminho[indice][1] == residual){
+                        //console.log(caminho[indice][0].origem);
                         return true;
                     }
                 }
@@ -1357,11 +1375,10 @@
                 for(var indiceA = 0;indiceA < ff_vertices.origem.length;indiceA++){
                     var aux_ver = ff_vertices.origem[indiceA];
                     var residual = aux_ver.capacidade - aux_ver.fluxo;
-                
                     if(residual > 0 && !ff_vertice_no_Caminho(caminho, aux_ver, residual)) {
-                        var tcaminho = caminho.slice(0);
-                        tcaminho.push([aux_ver, residual]);
-                        var resultado = ff_dfs(aux_ver.destino, destino, tcaminho);
+                        var tem_caminho = caminho.slice(0);
+                        tem_caminho.push([aux_ver, residual]);
+                        var resultado = ff_dfs(aux_ver.destino, destino, tem_caminho);
                         if(resultado != null){
                             return resultado;
                         }
@@ -1369,38 +1386,62 @@
                 }
                 return null;
             };
-
+            var temp = [];
             var fluxo_maximo = function(fonte, servidouro) {
                 var caminho = ff_dfs(fonte, servidouro, []);
-                console.log("DDD",caminho);
+                //console.log("DDD",caminho);
                 while(caminho != null) {
-                    var aux_fluxo = 99999999999;
+                    var menor_fluxo = 99999999999;
                     for(var indice = 0;indice < caminho.length;indice++) {
-                        console.log("i: ",indice,caminho);
-                        if(caminho[indice][1] < aux_fluxo){
-                            aux_fluxo = caminho[indice][1];
+                        //console.log("i: ",indice,caminho);
+                        if(caminho[indice][1] <  menor_fluxo){
+                             menor_fluxo = caminho[indice][1];
                         }
                     }
                     for(var indice = 0;indice < caminho.length; indice++) {
-                        caminho[indice][0].fluxo += aux_fluxo;
-                        caminho[indice][0].anterior.fluxo -= aux_fluxo;
-                        console.log(caminho[indice][0].fluxo);
+                        //caminho[indice][0].origem
+                        caminho[indice][0].fluxo +=  menor_fluxo;
+                        caminho[indice][0].anterior.fluxo -=  menor_fluxo;
+
+                        for(var indiceD = 0;indiceD < ff_vertices.origem.length; indiceD++){
+                            if(caminho[indice][0].origem == ff_vertices.origem[indiceD].origem){
+                                //console.log("=J");
+                                
+                                ff_vertices.origem[indiceD].fluxo = caminho[indice][0].fluxo;
+                                //console.log(ff_vertices.origem[indiceD].fluxo);
+                            }
+                        }
+                        for(var indiceD = 0;indiceD < ff_vertices.origem.length; indiceD++){
+                            if(caminho[indice][0].anterior.origem == ff_vertices.destino[indiceD].origem){
+                                ff_vertices.destino[indiceD].fluxo = caminho[indice][0].anterior.fluxo;
+                            }
+                        }
+
+                        //console.log(caminho[indice][0].origem,caminho[indice][0].fluxo);
+                        temp.push(caminho[indice][0].fluxo);
                     } 
                     caminho = ff_dfs(fonte, servidouro, []);
                 }
                 var soma = 0;
-                console.log("mirainikki", ff_vertices);
+                var cap = 0;
+                console.log("vertices final: ", ff_vertices);
                 for(var indice = 0; indice < ff_vertices.origem.length;indice++){
-                    soma += ff_vertices.origem[indice].capacidade;
+                    soma += ff_vertices.origem[indice].fluxo
+                    cap += ff_vertices.origem[indice].fluxo-ff_vertices.origem[indice].capacidade;
                 }
                 //return soma;
                 var ret = 0;
                 for(var indice = 0; indice < ff_vertices.destino.length;indice++){
                     ret += ff_vertices.destino[indice].fluxo;
                 }
-                return soma;
+                console.log(soma);
+                console.log(ret);
+                console.log(cap);
+                return (soma+ret)+cap;
             };
 
+
+            //INICIA VERTICES FORD
             for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
                 for(var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
                     add_ff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome,grafo[vertices[indiceA]].vizinhos[indiceB].peso);
@@ -1410,10 +1451,15 @@
             console.log("=========VERTICES==========");
             console.log(ff_vertices);
             console.log("============================");
-            console.log("fluxo maximo: ", fluxo_maximo("A","F"));
-
+            //
+            var caminhos = ff_dfs(fonte, servidouro, []);
+            console.log("======CAMINHOS=====");
+            console.log(caminhos);
+            console.log("===================")
             //console.log(soma, menorCapacidade);
             //console.log(grafoResidual);
+            console.log("fluxo maximo: ", fluxo_maximo("A","F"));
+            
             fn.alert(JSON.stringify("FF"));
         }
 
