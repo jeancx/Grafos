@@ -80,7 +80,12 @@
                 fn.prim();
             } else if (name === 'kruskal') {
                 fn.kruskal();
+            } else if (name === 'fordFukerson') {
+                fn.FF();
             }
+
+
+
         };
 
         /* ###################################################
@@ -1150,16 +1155,16 @@
             );
 
         };
-            fn.exist = function (nome,lista) {
-                for (var i = 0; i < lista.length;i++){
-                 if (lista[i] == nome) {
-                     return true;
-                 }
-             
+        fn.exist = function (nome, lista) {
+            for (var i = 0; i < lista.length; i++) {
+                if (lista[i] == nome) {
+                    return true;
                 }
-                return false;
-             
+
             }
+            return false;
+
+        }
 
         fn.TSPV = function (inicio) {
 
@@ -1173,10 +1178,10 @@
             var distancia = 0;
             //console.log(vertices);
             //console.log("grafo",grafo);
-            
+
 
             //fn.retornaMenor = function (v) {
-            
+
             //}
 
             caminho.push(posInicial);
@@ -1186,16 +1191,16 @@
                 //console.log("run: ", num);
                 var menorDistancia = 99999;
                 var menorVertice;
-                for (var indiceA = 0;indiceA < grafo[posInicial].vizinhos.length;indiceA++){
+                for (var indiceA = 0; indiceA < grafo[posInicial].vizinhos.length; indiceA++) {
                     //console.log(indiceA,grafo[posInicial].vizinhos[indiceA]);
-                    if (  grafo[posInicial].vizinhos[indiceA].peso < menorDistancia &&  !fn.exist(grafo[posInicial].vizinhos[indiceA].nome,caminho)) {
+                    if (grafo[posInicial].vizinhos[indiceA].peso < menorDistancia && !fn.exist(grafo[posInicial].vizinhos[indiceA].nome, caminho)) {
                         menorDistancia = grafo[posInicial].vizinhos[indiceA].peso;
                         menorVertice = grafo[posInicial].vizinhos[indiceA].nome;
                     }
-                    
-                //console.log("menor: ",menorVertice);
+
+                    //console.log("menor: ",menorVertice);
                 }
-                if(menorVertice === posInicial) {
+                if (menorVertice === posInicial) {
                     break;
                 }
                 caminho.push(menorVertice);
@@ -1203,9 +1208,9 @@
                 num += 1;
                 posInicial = menorVertice;
             }
-            console.log("Caminho do vertice:",inicio," ", caminho, "Distancia: ",distancia );
+            console.log("Caminho do vertice:", inicio, " ", caminho, "Distancia: ", distancia);
             return [caminho, distancia];
-            
+
             // var _recursiveRun = function (start, visitados, caminho, p) {
             //     if (p < grafo[start].vizinhos.length) {
             //         if (visitados.indexOf(grafo[start].vizinhos[p]) === -1) {
@@ -1237,8 +1242,8 @@
             var vertices = data.grafo.vertices;
             //console.log(vertices);
             var caminhos = [];
-            
-            for (var indice = 0;indice < vertices.length;indice++){
+
+            for (var indice = 0; indice < vertices.length; indice++) {
                 //console.log("JASEFHAKSGFH: ", vertices[indice]);
                 caminhos.push(fn.TSPV(vertices[indice]));
             }
@@ -1247,71 +1252,71 @@
             var indiceMenor;
             //console.log("FIM");
             //console.log(caminhos);
-            for (var indiceB = 0;indiceB < caminhos.length ;indiceB++) {
-                if ( caminhos[indiceB][1] < menor ){
+            for (var indiceB = 0; indiceB < caminhos.length; indiceB++) {
+                if (caminhos[indiceB][1] < menor) {
                     menor = caminhos[indiceB][1];
                     indiceMenor = indiceB;
                 }
             }
             console.log("Menor Caminho do Grafo: ", caminhos[indiceMenor]);
-            fn.alert(JSON.stringify("Menor Caminho do Grafo: "+ caminhos[indiceMenor]));
+            fn.alert(JSON.stringify("Menor Caminho do Grafo: " + caminhos[indiceMenor]));
             //fn.alert(JSON.stringify(caminhos+" "+distancia));
-        }
+        };
 
         fn.FF = function () {
             var grafo = fn.startGrafo();
-            
+
             var vertices = data.grafo.vertices;
             //grafo[posInicial].vizinhos.length
             var origens = [];
             var destinos = [];
 
-            for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
+            for (var indiceA = 0; indiceA < vertices.length; indiceA++) {
                 grafo[vertices[indiceA]].origens = 0;
                 grafo[vertices[indiceA]].destinos = 0;
             }
             for (var indice = 0; indice < vertices.length; indice++) {
-                for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
-                    for( var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
+                for (var indiceA = 0; indiceA < vertices.length; indiceA++) {
+                    for (var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++) {
                         //console.log(grafo[vertices[indiceA]].vizinhos[indiceB]);
                         //console.log("+++",grafo[vertices[indice]].nome,"+++",grafo[vertices[indiceA]].vizinhos[indiceB].nome,"+++")
                         if (grafo[vertices[indice]].nome == grafo[vertices[indiceA]].vizinhos[indiceB].nome) {
-                            
+
                             grafo[vertices[indice]].destinos++;
                         }
 
                     }
                 }
-                if (grafo[vertices[indice]].vizinhos.length == 0 ){
+                if (grafo[vertices[indice]].vizinhos.length == 0) {
                     destinos.push(indice);
                 }
             }
             for (var indiceC = 0; indiceC < vertices.length; indiceC++) {
-                
-                if ( grafo[vertices[indiceC]].destinos == 0){
+
+                if (grafo[vertices[indiceC]].destinos == 0) {
                     origens.push(indiceC);
                 }
             }
 
-            if(origens.length > 1){
+            if (origens.length > 1) {
                 vertices.push(vertices.length);
                 data.grafo.vertices.push("Y");
-                for(var indiceA;indiceA < origens.length; indiceA++){
-                    addAresta("Y",grafo[vertices[origens[indiceA]]],99999);
+                for (var indiceA; indiceA < origens.length; indiceA++) {
+                    addAresta("Y", grafo[vertices[origens[indiceA]]], 99999);
                 }
                 var fonte = grafo[vertices[origens[indiceA]]];
-            }else {
+            } else {
                 var fonte = grafo[vertices[origens[0]]].nome;
             }
-            if(destinos.length > 1){
+            if (destinos.length > 1) {
                 vertices.push(vertices.length);
                 data.grafo.vertices.push("Z");
-                for(var indiceA;indiceA < destinos.length; indiceA++){
+                for (var indiceA; indiceA < destinos.length; indiceA++) {
                     //grafo
-                    addAresta("Z",grafo[vertices[destinos[indiceA]]],99999);
+                    addAresta("Z", grafo[vertices[destinos[indiceA]]], 99999);
                 }
                 var fonte = grafo[vertices[destinos[indiceA]]];
-            }else {
+            } else {
                 var servidouro = grafo[vertices[destinos[0]]].nome;
             }
 
@@ -1320,12 +1325,12 @@
             console.log("----------------------------------------")
             console.log(destinos)
             console.log("----------------------------------------")
-            console.log("fonte: ", grafo[vertices[origens[0]]].nome, 
-                        "servidouro: ", grafo[vertices[destinos[0]]].nome);
+            console.log("fonte: ", grafo[vertices[origens[0]]].nome,
+                "servidouro: ", grafo[vertices[destinos[0]]].nome);
             console.log("----------------------------------------")
 
 
-            var ff_vertice = function(origem, destino, capacidade, fluxo) {
+            var ff_vertice = function (origem, destino, capacidade, fluxo) {
                 this.origem = origem;
                 this.destino = destino;
                 this.capacidade = capacidade;
@@ -1336,15 +1341,15 @@
 
             var ff_vertices = {origem: [], destino: []};
 
-            var add_ff_vertice = function(origem, destino, capacidade){
+            var add_ff_vertice = function (origem, destino, capacidade) {
                 var aux_ver = new ff_vertice(origem, destino, capacidade, 0);
                 var aux_rev = new ff_vertice(destino, origem, 0, 0);
                 aux_ver.anterior = aux_rev;
                 aux_rev.anterior = aux_ver;
-                if(ff_vertices.origem == undefined){
+                if (ff_vertices.origem == undefined) {
                     ff_vertices.origem = [];
                 }
-                if(ff_vertices.destino == undefined) {
+                if (ff_vertices.destino == undefined) {
                     ff_vertices.destino = [];
                 }
                 //console.log("pqpqpqpqpq");
@@ -1356,95 +1361,101 @@
                 //console.log(ff_vertices);
             };
 
-            var ff_vertice_no_Caminho = function(caminho, ff_vertice, residual) {
+            var ff_vertice_no_Caminho = function (caminho, ff_vertice, residual) {
                 //console.log("caminho: ", caminho);
-                
-                for(var indice = 0; indice < caminho.length; indice++){
-                    if(caminho[indice][0] == ff_vertice && caminho[indice][1] == residual){
+                //console.log("vertice: ", ff_vertice);
+                //console.log("residual :", residual);
+                for (var indice = 0; indice < caminho.length; indice++) {
+                    if (caminho[indice][0] == ff_vertice){ //&& caminho[indice][1] == residual) {
                         //console.log(caminho[indice][0].origem);
                         return true;
                     }
                 }
                 return false;
-            }
+            };
 
-            var ff_dfs = function(origem, destino, caminho) {
-                if(origem == destino) {
+            var ff_dfs = function (origem, destino, caminho) {
+                if (origem === destino) {
                     return caminho;
                 }
-                for(var indiceA = 0;indiceA < ff_vertices.origem.length;indiceA++){
+                for (var indiceA = 0; indiceA < ff_vertices.origem.length; indiceA++) {
                     var aux_ver = ff_vertices.origem[indiceA];
                     var residual = aux_ver.capacidade - aux_ver.fluxo;
-                    if(residual > 0 && !ff_vertice_no_Caminho(caminho, aux_ver, residual)) {
+                    if (residual > 0 && !ff_vertice_no_Caminho(caminho, aux_ver, residual)) {
                         var tem_caminho = caminho.slice(0);
+                        //console.log(tem_caminho.length);
                         tem_caminho.push([aux_ver, residual]);
                         var resultado = ff_dfs(aux_ver.destino, destino, tem_caminho);
-                        if(resultado != null){
+                        if (resultado !== null) {
                             return resultado;
                         }
+
                     }
                 }
                 return null;
             };
             var temp = [];
-            var fluxo_maximo = function(fonte, servidouro) {
+            var fluxo_maximo = function (fonte, servidouro) {
                 var caminho = ff_dfs(fonte, servidouro, []);
                 //console.log("DDD",caminho);
-                while(caminho != null) {
+                var s = 0;
+                while (caminho !== null) {
                     var menor_fluxo = 99999999999;
-                    for(var indice = 0;indice < caminho.length;indice++) {
+                    for (var indice = 0; indice < caminho.length; indice++) {
                         //console.log("i: ",indice,caminho);
-                        if(caminho[indice][1] <  menor_fluxo){
-                             menor_fluxo = caminho[indice][1];
+                        if (caminho[indice][1] < menor_fluxo) {
+                            menor_fluxo = caminho[indice][1];
                         }
                     }
-                    for(var indice = 0;indice < caminho.length; indice++) {
+                    s += menor_fluxo;
+                    console.log("caminho: ", caminho);
+                    for (var indice = 0; indice < caminho.length; indice++) {
                         //caminho[indice][0].origem
-                        caminho[indice][0].fluxo +=  menor_fluxo;
-                        caminho[indice][0].anterior.fluxo -=  menor_fluxo;
+                        caminho[indice][0].fluxo += menor_fluxo;
+                        caminho[indice][0].anterior.fluxo -= menor_fluxo;
 
-                        for(var indiceD = 0;indiceD < ff_vertices.origem.length; indiceD++){
-                            if(caminho[indice][0].origem == ff_vertices.origem[indiceD].origem){
+                        for (var indiceD = 0; indiceD < ff_vertices.origem.length; indiceD++) {
+                            if (caminho[indice][0].origem === ff_vertices.origem[indiceD].origem && caminho[indice][0].destino === ff_vertices.origem[indiceD].destino) {
                                 //console.log("=J");
-                                
+
                                 ff_vertices.origem[indiceD].fluxo = caminho[indice][0].fluxo;
                                 //console.log(ff_vertices.origem[indiceD].fluxo);
                             }
                         }
-                        for(var indiceD = 0;indiceD < ff_vertices.origem.length; indiceD++){
-                            if(caminho[indice][0].anterior.origem == ff_vertices.destino[indiceD].origem){
+                        for (var indiceD = 0; indiceD < ff_vertices.origem.length; indiceD++) {
+                            if (caminho[indice][0].anterior.origem === ff_vertices.destino[indiceD].origem) {
                                 ff_vertices.destino[indiceD].fluxo = caminho[indice][0].anterior.fluxo;
                             }
                         }
 
                         //console.log(caminho[indice][0].origem,caminho[indice][0].fluxo);
-                        temp.push(caminho[indice][0].fluxo);
-                    } 
+                        console.log("solução: ", s);
+                    }
                     caminho = ff_dfs(fonte, servidouro, []);
                 }
                 var soma = 0;
                 var cap = 0;
                 console.log("vertices final: ", ff_vertices);
-                for(var indice = 0; indice < ff_vertices.origem.length;indice++){
+                for (var indice = 0; indice < ff_vertices.origem.length; indice++) {
                     soma += ff_vertices.origem[indice].fluxo
-                    cap += ff_vertices.origem[indice].fluxo-ff_vertices.origem[indice].capacidade;
+                    cap += ff_vertices.origem[indice].fluxo - ff_vertices.origem[indice].capacidade;
                 }
                 //return soma;
                 var ret = 0;
-                for(var indice = 0; indice < ff_vertices.destino.length;indice++){
+                for (var indice = 0; indice < ff_vertices.destino.length; indice++) {
                     ret += ff_vertices.destino[indice].fluxo;
                 }
                 console.log(soma);
                 console.log(ret);
                 console.log(cap);
-                return (soma+ret)+cap;
+                return (soma + ret) + cap;
             };
 
 
             //INICIA VERTICES FORD
-            for (var indiceA = 0; indiceA < vertices.length; indiceA++ ){
-                for(var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++){
-                    add_ff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome,grafo[vertices[indiceA]].vizinhos[indiceB].peso);
+            for (var indiceA = 0; indiceA < vertices.length; indiceA++) {
+                for (var indiceB = 0; indiceB < grafo[vertices[indiceA]].vizinhos.length; indiceB++) {
+                    add_ff_vertice(vertices[indiceA], grafo[vertices[indiceA]].vizinhos[indiceB].nome, grafo[vertices[indiceA]].vizinhos[indiceB].peso);
                 }
             }
 
@@ -1458,10 +1469,11 @@
             console.log("===================")
             //console.log(soma, menorCapacidade);
             //console.log(grafoResidual);
-            console.log("fluxo maximo: ", fluxo_maximo("A","F"));
-            
-            fn.alert(JSON.stringify("FF"));
-        }
+            var fm = fluxo_maximo("A", "F");
+            console.log("fluxo maximo: ", fm);
+
+            fn.alert(JSON.stringify(fm));
+        };
 
         /* ###################################################
          *  ##########     FUNÇÕES GERAIS      ################
@@ -1504,22 +1516,22 @@
 
             $timeout(function () {
 
-/*              fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addVertice();
-                fn.addAresta('A', 'C', 7);
-                fn.addAresta('A', 'D', 2);
-                fn.addAresta('A', 'E', 10);
-                fn.addAresta('B', 'C', 3);
-                fn.addAresta('B', 'F', 2);
-                fn.addAresta('C', 'E', 9);
-                fn.addAresta('C', 'F', 3);
-                fn.addAresta('D', 'E', 7);
-                fn.addAresta('D', 'F', 4);
-                fn.addAresta('E', 'F', 8);*/
+                /*              fn.addVertice();
+                 fn.addVertice();
+                 fn.addVertice();
+                 fn.addVertice();
+                 fn.addVertice();
+                 fn.addVertice();
+                 fn.addAresta('A', 'C', 7);
+                 fn.addAresta('A', 'D', 2);
+                 fn.addAresta('A', 'E', 10);
+                 fn.addAresta('B', 'C', 3);
+                 fn.addAresta('B', 'F', 2);
+                 fn.addAresta('C', 'E', 9);
+                 fn.addAresta('C', 'F', 3);
+                 fn.addAresta('D', 'E', 7);
+                 fn.addAresta('D', 'F', 4);
+                 fn.addAresta('E', 'F', 8);*/
 
 
                 //TESTE CAIXEIRO VIAJANTE
@@ -1561,17 +1573,17 @@
                 fn.addVertice();
                 fn.addVertice();
                 fn.addVertice();
-                fn.addAresta('A','B', 16)
-                fn.addAresta('A','C', 13)
-                fn.addAresta('B','C', 10)
-                fn.addAresta('B','D', 12)
-                fn.addAresta('C','B', 4)
-                fn.addAresta('C','E', 14)
-                fn.addAresta('D','C', 9)
-                fn.addAresta('D','F', 20)
-                fn.addAresta('E','D', 7)
-                fn.addAresta('E','F', 4)
-                fn.FF();
+                fn.addAresta('A', 'B', 16)
+                fn.addAresta('A', 'C', 13)
+                fn.addAresta('B', 'C', 10)
+                fn.addAresta('B', 'D', 12)
+                fn.addAresta('C', 'B', 4)
+                fn.addAresta('C', 'E', 14)
+                fn.addAresta('D', 'C', 9)
+                fn.addAresta('D', 'F', 20)
+                fn.addAresta('E', 'D', 7)
+                fn.addAresta('E', 'F', 4)
+                //fn.FF();
 
             }, 1000);
             $timeout(function () {
